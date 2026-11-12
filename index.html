@@ -86,15 +86,15 @@
     padding:3px 10px;font:inherit;font-size:12px;cursor:pointer}
   .chip.on{color:var(--text);border-color:var(--accent);background:rgba(124,196,255,.12)}
   .wx-body{padding:0 10px 10px}
-  .wx-scroll{overflow-x:auto;border-radius:8px;-webkit-overflow-scrolling:touch}
+  .wx-scroll{overflow-x:auto;border-radius:8px;-webkit-overflow-scrolling:touch;max-width:720px}
   .wx-yr{background:#fff}
-  .wx-yr img{display:block;width:100%;min-width:640px}
+  .wx-yr img{display:block;width:100%;min-width:560px}
   .wx-icm{background:#fff}
-  .wx-icm svg{display:block;width:100%;min-width:600px;height:auto}
+  .wx-icm svg{display:block;width:100%;min-width:560px;height:auto}
   .wx-msg{color:var(--muted);font-size:13px;padding:24px 8px;text-align:center}
   .wx-src{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
   .wx-src a{color:var(--muted)}
-  .wxgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr))}
+  .wxgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),740px))}
   .wxcard h3{font-size:13px;margin:0 0 6px;color:var(--muted);font-weight:600}
   footer{color:var(--muted);font-size:12px;padding:6px 16px 24px;text-align:center}
   footer a{color:var(--muted)}
@@ -382,8 +382,9 @@ function drawICM(D, p){
     if (!o.noNight) nights.forEach(([a,b]) => { const x1=Math.max(L,xOf(a)), x2=Math.min(L+PW,xOf(b)); rect(x1, y, x2-x1, h, o.bg ? "#000" : C.night, o.bg ? .12 : 1); });
     if (o.draw) o.draw();
     for (let i=0;i<=n;i++) if (localHour(t(i) - D.step/2) % 3 === 0 && i>0 && i<n) line(XE(i), y, XE(i), y+h, C.grid, .6, "1.5 2.5");
-    (o.lt||[]).forEach(([v,lab]) => { const yy = o.Y(v); if (yy>y+0.5 && yy<y+h-0.5) line(L, yy, L+PW, yy, C.grid, .6, "1.5 2.5"); text(L-6, yy+4, lab, {a:"end"}); });
-    (o.rt||[]).forEach(([v,lab]) => text(L+PW+6, o.Yr ? o.Yr(v)+4 : o.Y(v)+4, lab, {a:"start", c:o.rc||C.lab}));
+    const ly = yy => Math.min(Math.max(yy+4, y+9), y+h-1);
+    (o.lt||[]).forEach(([v,lab]) => { const yy = o.Y(v); if (yy>y+0.5 && yy<y+h-0.5) line(L, yy, L+PW, yy, C.grid, .6, "1.5 2.5"); text(L-6, ly(yy), lab, {a:"end"}); });
+    (o.rt||[]).forEach(([v,lab]) => text(L+PW+6, ly(o.Yr ? o.Yr(v) : o.Y(v)), lab, {a:"start", c:o.rc||C.lab}));
     g.push(`<rect x="${L}" y="${f1(y)}" width="${PW}" height="${f1(h)}" fill="none" stroke="${C.frame}" stroke-width="1"/>`);
     if (o.ll) { text(L-64, y+h/2, o.ll, {r:1, s:11}); if (o.lu) text(L-50, y+h/2, o.lu, {r:1, s:10}); }
     if (o.rl) { text(L+PW+58, y+h/2, o.rl, {r:1, s:11, c:o.rc||C.lab}); if (o.ru) text(L+PW+72, y+h/2, o.ru, {r:1, s:10, c:o.rc||C.lab}); }
