@@ -12,7 +12,7 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 - **Wybór kamer:** 21 z 62 sprawdzonych, zaznaczonych w arkuszu „Kamery online – wybór kamer” (https://claude.ai/artifact/8MP8WFj3tjJbamdySi7ZD1).
 
 ## Działanie strony
-- Zakładki: Wszystkie / Tatry / Beskid Żywiecki / Gorce / Pieniny.
+- Zakładki: Wszystkie / Beskid Żywiecki / Tatry / Gorce / Pieniny (w tej kolejności są też sekcje na stronie).
 - Zdjęcia (TOPR) odświeżają się co 5 minut i po powrocie do karty. Jest też przycisk „Odśwież”.
 - Wideo i odtwarzacze startują dopiero po stuknięciu, żeby oszczędzać dane (strumień to ok. 2 Mb/s). Przełącznik „wideo w kafelkach” włącza odtwarzanie wszystkich naraz i jest zapamiętywany.
 - Przełącznik „miniatury wideo” (domyślnie włączony na komputerze, wyłączony na telefonie): z każdego strumienia HLS pobierana jest jedna klatka, odświeżana co 10 min (ok. 1 MB na kamerę), a odtwarzacze webcamera.pl i Windy ładują się w kafelku i pokazują swój podgląd. Żywiec Rynek 1 i 3 (stream360) nie mają podglądu, bo ich odtwarzacz przed kliknięciem pokazuje tylko herb.

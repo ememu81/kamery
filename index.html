@@ -148,7 +148,7 @@ const CAMS = [
   {r:"Pieniny", n:"Stara Lubowla", t:"embed", s:"https://webcams.windy.com/webcams/public/embed/player?webcamId=1621786379&playerType=day&autoPlay=1&interactive=1", p:"https://www.trzykorony.pl/schronisko/kamery"},
 ];
 
-const REGIONS = ["Tatry","Beskid Żywiecki","Gorce","Pieniny"];
+const REGIONS = ["Beskid Żywiecki","Tatry","Gorce","Pieniny"];
 const REFRESH_MS = 5*60*1000;
 const store = {
   get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
@@ -333,7 +333,8 @@ function refreshImages(){
 /* ---------- modal ---------- */
 let modalIdx = -1, modalHls = null;
 function visibleList(){
-  return current==="wszystkie" ? CAMS : CAMS.filter(c=>slug(c.r)===current);
+  const list = current==="wszystkie" ? CAMS : CAMS.filter(c=>slug(c.r)===current);
+  return list.slice().sort((a,b)=>REGIONS.indexOf(a.r)-REGIONS.indexOf(b.r) || a.i-b.i);
 }
 function clearModalMedia(){
   if (modalHls){ try{modalHls.destroy()}catch(e){} modalHls=null; }
