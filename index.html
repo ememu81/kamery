@@ -73,6 +73,28 @@
   .nav-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:rgba(0,0,0,.45);
     color:#fff;border:0;width:44px;height:64px;font-size:26px;cursor:pointer;border-radius:8px}
   .nav-arrow.l{left:6px}.nav-arrow.r{right:6px}
+  /* pogoda */
+  .wx{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:0 0 10px;overflow:hidden}
+  .wx-head{display:flex;align-items:center;gap:8px;padding:8px 10px;flex-wrap:wrap}
+  .wx-head .t{font-weight:600;font-size:14px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+  .wx-head .t .chev{display:inline-block;transition:transform .15s;color:var(--muted);font-size:12px}
+  .wx.closed .chev{transform:rotate(-90deg)}
+  .wx.closed .wx-body{display:none}
+  .wx-head .sp{flex:1}
+  .chips{display:flex;gap:4px;flex-wrap:wrap}
+  .chip{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:20px;
+    padding:3px 10px;font:inherit;font-size:12px;cursor:pointer}
+  .chip.on{color:var(--text);border-color:var(--accent);background:rgba(124,196,255,.12)}
+  .wx-body{padding:0 10px 10px}
+  .wx-scroll{overflow-x:auto;border-radius:8px;-webkit-overflow-scrolling:touch}
+  .wx-yr{background:#fff}
+  .wx-yr img{display:block;width:100%;min-width:640px}
+  .wx-icm svg{display:block;width:100%;min-width:680px;height:auto}
+  .wx-msg{color:var(--muted);font-size:13px;padding:24px 8px;text-align:center}
+  .wx-src{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
+  .wx-src a{color:var(--muted)}
+  .wxgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr))}
+  .wxcard h3{font-size:13px;margin:0 0 6px;color:var(--muted);font-weight:600}
   footer{color:var(--muted);font-size:12px;padding:6px 16px 24px;text-align:center}
   footer a{color:var(--muted)}
 </style>
@@ -92,7 +114,7 @@
   <nav id="tabs"></nav>
 </header>
 <main id="main"></main>
-<footer>Zdjęcia odświeżają się co 5 min, miniatury wideo co 10 min. Godzina wykonania zdjęcia jest w jego rogu. Obraz należy do właścicieli kamer – kliknij „źródło”, aby przejść na ich stronę.</footer>
+<footer>Zdjęcia odświeżają się co 5 min, miniatury wideo co 10 min, prognozy co godzinę. Godzina wykonania zdjęcia jest w jego rogu. Obraz należy do właścicieli kamer – kliknij „źródło”, aby przejść na ich stronę.</footer>
 
 <div class="modal" id="modal">
   <div class="mbar">
@@ -126,15 +148,16 @@ const CAMS = [
   {r:"Tatry", n:"Kasprowy Wierch – Dolina Goryczkowa / Czerwone Wierchy", t:"img", s:TOPR("goryczkowa/gorycz.jpg"), s2:"https://pogoda.topr.pl/download/current/kwgr.jpeg", p:"http://kamery.topr.pl/"},
   {r:"Tatry", n:"Kościelisko – widok na Czerwone Wierchy (kamera nie działa od 29.09)", t:"img", s:TOPR("czwierchy/czwierchy.jpg"), s2:"https://pogoda.topr.pl/download/current/kscw.jpeg", p:"http://kamery.topr.pl/"},
 
-  // --- Beskid Żywiecki ---
-  {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Tatr", t:"hls", s:"https://stream.arkomnet.eu/rysianka1/index.m3u8", p:"https://rysianka.pl/"},
-  {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Hali Stopkowej", t:"hls", s:"https://stream.arkomnet.eu/rysianka2/index.m3u8", p:"https://rysianka.pl/"},
-  {r:"Beskid Żywiecki", n:"Widok na Gminę Węgierska Górka", t:"hls", s:"https://stream.arkomnet.eu/wgwidok/index.m3u8", p:"https://www.wgmedia.eu/kamery/widok-na-gmine-wegierska-gorka-z-baraniej"},
-  {r:"Beskid Żywiecki", n:"Cisiec – Wyciąg Za Groniem", t:"hls", s:"https://stream.arkomnet.eu/xxx_wyciag_III/index.m3u8", p:"https://www.wgmedia.eu/kamery/cisiec-wyciag-za-groniem"},
-  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 1", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index1.php", p:"https://zywiec.pl/kamery"},
-  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 2", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_f0027b", p:"https://zywiec.pl/kamery"},
-  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 3", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index3.php", p:"https://zywiec.pl/kamery"},
-  {r:"Beskid Żywiecki", n:"Żywiec – widok ze Średniego Grojca", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_1ce519", p:"https://zywiec.pl/kamery"},
+  // --- Beskidy ---
+  {r:"Beskidy", n:"Rysianka – w kierunku Tatr", t:"hls", s:"https://stream.arkomnet.eu/rysianka1/index.m3u8", p:"https://rysianka.pl/"},
+  {r:"Beskidy", n:"Rysianka – w kierunku Hali Stopkowej", t:"hls", s:"https://stream.arkomnet.eu/rysianka2/index.m3u8", p:"https://rysianka.pl/"},
+  {r:"Beskidy", n:"Widok na Gminę Węgierska Górka", t:"hls", s:"https://stream.arkomnet.eu/wgwidok/index.m3u8", p:"https://www.wgmedia.eu/kamery/widok-na-gmine-wegierska-gorka-z-baraniej"},
+  {r:"Beskidy", n:"Cisiec – Wyciąg Za Groniem", t:"hls", s:"https://stream.arkomnet.eu/xxx_wyciag_III/index.m3u8", p:"https://www.wgmedia.eu/kamery/cisiec-wyciag-za-groniem"},
+  {r:"Beskidy", n:"Koniaków – Centrum (Ochodzita)", t:"hls", s:"https://polineo.pl:5443/LiveApp/streams/480833538014407854235726.m3u8", p:"https://www.istebna.eu/mieszkaniec/kamera-koniakow-centrum"},
+  {r:"Beskidy", n:"Żywiec – Rynek, kamera 1", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index1.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskidy", n:"Żywiec – Rynek, kamera 2", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_f0027b", p:"https://zywiec.pl/kamery"},
+  {r:"Beskidy", n:"Żywiec – Rynek, kamera 3", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index3.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskidy", n:"Żywiec – widok ze Średniego Grojca", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_1ce519", p:"https://zywiec.pl/kamery"},
 
   // --- Gorce (Ochotnica Dolna) ---
   {r:"Gorce", n:"Suchy Groń", t:"hls", s:"https://ochotnica.epicserv.pl/streams/cam5/playlist.m3u8", p:"https://www.ochotnica.pl/wieze-widokowe-kamery-online/"},
@@ -148,8 +171,18 @@ const CAMS = [
   {r:"Pieniny", n:"Stara Lubowla", t:"embed", s:"https://webcams.windy.com/webcams/public/embed/player?webcamId=1621786379&playerType=day&autoPlay=1&interactive=1", p:"https://www.trzykorony.pl/schronisko/kamery"},
 ];
 
-const REGIONS = ["Beskid Żywiecki","Tatry","Gorce","Pieniny"];
+const REGIONS = ["Beskidy","Tatry","Gorce","Pieniny"];
 const REFRESH_MS = 5*60*1000;
+
+/* ======= PUNKTY PROGNOZY ======= */
+const PLACES = [
+  {k:"rysianka",   n:"Hala Rysianka",        r:"Beskidy", lat:49.5409, lon:19.1306},
+  {k:"babia",      n:"Babia Góra",           r:"Beskidy", lat:49.5732, lon:19.5294},
+  {k:"ochodzita",  n:"Ochodzita",            r:"Beskidy", lat:49.5456, lon:18.9551},
+  {k:"kasprowy",   n:"Kasprowy Wierch",      r:"Tatry",   lat:49.2318, lon:19.9817},
+  {k:"trzykorony", n:"Trzy Korony",          r:"Pieniny", lat:49.4147, lon:20.4122},
+];
+const WX_MS = 60*60*1000;
 const store = {
   get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
@@ -164,12 +197,14 @@ let autoplay = store.get("autoplay", false);
 const isMobile = matchMedia("(pointer:coarse)").matches || innerWidth < 700;
 let thumbs = store.get("thumbs", !isMobile);
 const THUMB_MS = 10*60*1000;
+let wxSrc = store.get("wxSrc", "yr");
 const players = new Map(); // tile video -> hls instance
 
 /* ---------- tabs ---------- */
 function renderTabs(){
   const tabs = [{k:"wszystkie",label:"Wszystkie",n:CAMS.length}]
-    .concat(REGIONS.map(r=>({k:slug(r),label:r,n:CAMS.filter(c=>c.r===r).length})));
+    .concat(REGIONS.map(r=>({k:slug(r),label:r,n:CAMS.filter(c=>c.r===r).length})))
+    .concat([{k:"pogoda",label:"Pogoda",n:PLACES.length}]);
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
   tabs.forEach(t=>{
@@ -248,6 +283,235 @@ function destroyThumbs(){
 }
 function refreshThumbs(){ thumbList.forEach(grabThumb); }
 
+
+/* ---------- pogoda: yr.no (gotowy SVG) i ICM UM 4 km (dane z API, rysowane tutaj) ---------- */
+const TZ = "Europe/Warsaw";
+const fmtH = new Intl.DateTimeFormat("pl-PL",{timeZone:TZ,hour:"2-digit",hourCycle:"h23"});
+const fmtDay = new Intl.DateTimeFormat("pl-PL",{timeZone:TZ,weekday:"short",day:"numeric",month:"numeric"});
+const fmtRun = new Intl.DateTimeFormat("pl-PL",{timeZone:TZ,day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"});
+const localHour = t => +fmtH.format(t);
+
+const yrUrl = p => `https://www.yr.no/en/content/${p.lat},${p.lon}/meteogram.svg`;
+const yrPage = p => `https://www.yr.no/en/forecast/graph/${p.lat},${p.lon}`;
+
+const ICM_API = "https://devmgramapi.meteo.pl/meteorograms";
+let icmAvail = {t:0, v:null};
+const icmCache = new Map();
+async function icmRun(){
+  if (!icmAvail.v || Date.now()-icmAvail.t > 20*60*1000){
+    const r = await fetch(ICM_API + "/available", {cache:"no-store"});
+    if (!r.ok) throw new Error("available " + r.status);
+    icmAvail = {t:Date.now(), v: await r.json()};
+  }
+  const runs = (icmAvail.v.um4_120 || []);
+  if (!runs.length) throw new Error("brak przebiegów UM");
+  return runs[runs.length-1];
+}
+async function icmData(p){
+  const run = await icmRun();
+  const key = p.k + ":" + run;
+  if (icmCache.has(key)) return icmCache.get(key);
+  const r = await fetch(ICM_API + "/um4_120", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({point:{lat:String(p.lat), lon:String(p.lon)}, date:run})});
+  if (!r.ok) throw new Error("um4_120 " + r.status);
+  const j = await r.json();
+  const d = j.data || {};
+  const ser = k => (d[k] && d[k].data || []).map(v => (v === null || v < -1e6 || Number.isNaN(+v)) ? NaN : +v);
+  const f = d.airtmp_point;
+  const out = {
+    run, t0: (+f.first_timestamp)*1000, step: (+f.interval||3600)*1000,
+    temp: ser("airtmp_point"), tmin: ser("airtmp_min"), tmax: ser("airtmp_max"), dew: ser("dwptmp_point"),
+    pcp: ser("pcpttl_aver"), pcpmax: ser("pcpttl_max"), ptype: ser("pcpttl_type_max"),
+    wind: ser("wind10_sd_true_prev_point"), gust: ser("wind_gust_max"), dir: ser("wind10_dr_deg_true_prev_point"),
+    cld: ser("cldtot_aver"), pres: ser("slpres_point")
+  };
+  icmCache.set(key, out);
+  return out;
+}
+
+// przybliżony wschód/zachód słońca (UTC, ms) dla danego dnia i punktu
+function sunTimes(dayUtcMs, lat, lon){
+  const rad = Math.PI/180, d = new Date(dayUtcMs);
+  const n = Math.floor((Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()) - Date.UTC(2000,0,1,12))/864e5) + 1;
+  const Js = n - lon/360, M = (357.5291 + 0.98560028*Js) % 360;
+  const C = 1.9148*Math.sin(M*rad) + 0.02*Math.sin(2*M*rad) + 0.0003*Math.sin(3*M*rad);
+  const L = (M + C + 180 + 102.9372) % 360;
+  const Jt = 2451545 + Js + 0.0053*Math.sin(M*rad) - 0.0069*Math.sin(2*L*rad);
+  const dec = Math.asin(Math.sin(L*rad)*Math.sin(23.44*rad));
+  const cosw = (Math.sin(-0.83*rad) - Math.sin(lat*rad)*Math.sin(dec)) / (Math.cos(lat*rad)*Math.cos(dec));
+  const w = Math.acos(Math.max(-1, Math.min(1, cosw))) / rad;
+  const toMs = J => (J - 2440587.5) * 864e5;
+  return [toMs(Jt - w/360), toMs(Jt + w/360)];
+}
+
+function drawICM(D, p){
+  const n = D.temp.length, W = 960, L = 40, R = 40;
+  const top = 22, hT = 150, gap = 10, hC = 14, hP = 70, hW = 70;
+  const yT0 = top, yC0 = yT0 + hT + gap, yP0 = yC0 + hC + gap, yW0 = yP0 + hP + gap, H = yW0 + hW + 22;
+  const X = i => L + i*(W-L-R)/(n-1);
+  const t = i => D.t0 + i*D.step;
+  const fin = a => a.filter(Number.isFinite);
+  const esc = v => Number.isFinite(v) ? v : null;
+  let g = [];
+  // noc
+  const daysSeen = new Set();
+  for (let i=0;i<n;i++){ const dd = new Date(t(i)); daysSeen.add(Date.UTC(dd.getUTCFullYear(),dd.getUTCMonth(),dd.getUTCDate())); }
+  const tStart = t(0), tEnd = t(n-1), xOf = ms => L + (ms - tStart)/(tEnd - tStart)*(W-L-R);
+  const nights = []; let prevSet = tStart - 864e5;
+  [...daysSeen].sort().forEach(day => { const [rise, set] = sunTimes(day, p.lat, p.lon); nights.push([prevSet, rise]); prevSet = set; });
+  nights.push([prevSet, tEnd + 864e5]);
+  nights.forEach(([a,b]) => { const x1 = Math.max(L, xOf(a)), x2 = Math.min(W-R, xOf(b)); if (x2 > x1)
+    g.push(`<rect x="${x1.toFixed(1)}" y="${yT0}" width="${(x2-x1).toFixed(1)}" height="${H-22-yT0}" fill="#000" opacity=".28"/>`); });
+  // dni: linie o północy + etykiety
+  for (let i=0;i<n;i++){
+    if (localHour(t(i)) === 0){
+      const x = X(i).toFixed(1);
+      g.push(`<line x1="${x}" x2="${x}" y1="${top-16}" y2="${H-22}" stroke="#5a6470" stroke-width="1"/>`);
+    }
+    if (localHour(t(i)) === 12) g.push(`<text x="${X(i).toFixed(1)}" y="${top-6}" fill="#c9d1d9" font-size="12" text-anchor="middle">${fmtDay.format(t(i))}</text>`);
+    if (localHour(t(i)) % 6 === 0 && i>0 && i<n-1) g.push(`<text x="${X(i).toFixed(1)}" y="${H-8}" fill="#7d8792" font-size="10" text-anchor="middle">${localHour(t(i))}</text>`);
+  }
+  // temperatura
+  const tv = fin(D.temp.concat(D.tmin, D.tmax, D.dew));
+  let tlo = Math.floor(Math.min(...tv) - 1), thi = Math.ceil(Math.max(...tv) + 1);
+  if (thi - tlo < 8){ const m = (thi+tlo)/2; tlo = Math.floor(m-4); thi = Math.ceil(m+4); }
+  const YT = v => yT0 + hT - (v - tlo)/(thi - tlo)*hT;
+  const stepT = (thi-tlo) > 24 ? 5 : (thi-tlo) > 12 ? 4 : 2;
+  for (let v = Math.ceil(tlo/stepT)*stepT; v <= thi; v += stepT){
+    const y = YT(v).toFixed(1);
+    g.push(`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="${v===0?'#4ea3ff':'#2a3039'}" stroke-width="1" ${v===0?'stroke-dasharray="4 3"':''}/>`);
+    g.push(`<text x="${L-5}" y="${(+y+4)}" fill="#9aa3ad" font-size="10" text-anchor="end">${v}°</text>`);
+  }
+  const path = (arr, Y) => { let d = "", pen = false; arr.forEach((v,i)=>{ if (Number.isFinite(v)){ d += (pen?"L":"M") + X(i).toFixed(1) + " " + Y(v).toFixed(1) + " "; pen = true; } else pen = false; }); return d; };
+  if (fin(D.tmin).length && fin(D.tmax).length){
+    let up = "", dn = "";
+    for (let i=0;i<n;i++){ if (Number.isFinite(D.tmax[i])) up += (up?"L":"M") + X(i).toFixed(1)+" "+YT(D.tmax[i]).toFixed(1)+" "; }
+    for (let i=n-1;i>=0;i--){ if (Number.isFinite(D.tmin[i])) dn += "L" + X(i).toFixed(1)+" "+YT(D.tmin[i]).toFixed(1)+" "; }
+    g.push(`<path d="${up}${dn}Z" fill="#ff6b6b" opacity=".16"/>`);
+  }
+  g.push(`<path d="${path(D.dew, YT)}" fill="none" stroke="#5fd18b" stroke-width="1.3" stroke-dasharray="3 3"/>`);
+  g.push(`<path d="${path(D.temp, YT)}" fill="none" stroke="#ff6b6b" stroke-width="2"/>`);
+  g.push(`<text x="${L}" y="${yT0+12}" fill="#ff8a8a" font-size="11">temperatura °C</text>`);
+  // zachmurzenie
+  for (let i=0;i<n;i++){ const c = D.cld[i]; if (!Number.isFinite(c)) continue;
+    const x = X(i) - (W-L-R)/(n-1)/2;
+    g.push(`<rect x="${x.toFixed(1)}" y="${yC0}" width="${((W-L-R)/(n-1)+0.6).toFixed(1)}" height="${hC}" fill="#c9d1d9" opacity="${(0.08+0.8*Math.min(1,Math.max(0,c))).toFixed(2)}"/>`); }
+  g.push(`<text x="${L-5}" y="${yC0+11}" fill="#9aa3ad" font-size="10" text-anchor="end">chm.</text>`);
+  // opad
+  const pmax = Math.max(1, ...fin(D.pcpmax.concat(D.pcp)));
+  const YP = v => yP0 + hP - Math.min(v, pmax)/pmax*hP;
+  const bw = Math.max(1.5, (W-L-R)/(n-1)*0.8);
+  for (let i=0;i<n;i++){
+    const mx = D.pcpmax[i], av = D.pcp[i];
+    if (Number.isFinite(mx) && mx > 0.05) g.push(`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${YP(mx).toFixed(1)}" width="${bw.toFixed(1)}" height="${(yP0+hP-YP(mx)).toFixed(1)}" fill="#4ea3ff" opacity=".25"/>`);
+    if (Number.isFinite(av) && av > 0.02){ const snow = D.ptype[i] >= 2;
+      g.push(`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${YP(av).toFixed(1)}" width="${bw.toFixed(1)}" height="${(yP0+hP-YP(av)).toFixed(1)}" fill="${snow?'#d6e6ff':'#4ea3ff'}"/>`); }
+  }
+  g.push(`<line x1="${L}" x2="${W-R}" y1="${yP0+hP}" y2="${yP0+hP}" stroke="#2a3039"/>`);
+  g.push(`<text x="${L-5}" y="${yP0+10}" fill="#9aa3ad" font-size="10" text-anchor="end">${pmax.toFixed(pmax<3?1:0)}</text>`);
+  g.push(`<text x="${L-5}" y="${yP0+hP}" fill="#9aa3ad" font-size="10" text-anchor="end">0</text>`);
+  g.push(`<text x="${L+2}" y="${yP0+11}" fill="#7fbfff" font-size="11">opad mm/h</text>`);
+  // wiatr
+  const wmax = Math.max(5, ...fin(D.gust.concat(D.wind)));
+  const YW = v => yW0 + hW - v/wmax*hW;
+  g.push(`<line x1="${L}" x2="${W-R}" y1="${yW0+hW}" y2="${yW0+hW}" stroke="#2a3039"/>`);
+  g.push(`<path d="${path(D.gust, YW)}" fill="none" stroke="#c792ea" stroke-width="1.2" stroke-dasharray="4 3" opacity=".8"/>`);
+  g.push(`<path d="${path(D.wind, YW)}" fill="none" stroke="#c792ea" stroke-width="2"/>`);
+  for (let i=1;i<n-1;i+=3){ const dr = D.dir[i]; if (!Number.isFinite(dr)) continue;
+    const x = X(i), y = yW0 + 8;
+    g.push(`<g transform="translate(${x.toFixed(1)},${y}) rotate(${(dr+180).toFixed(0)})"><path d="M0 -6 L3 2 L0 0 L-3 2 Z" fill="#c9d1d9" opacity=".85"/></g>`); }
+  g.push(`<text x="${L-5}" y="${yW0+10}" fill="#9aa3ad" font-size="10" text-anchor="end">${Math.round(wmax)}</text>`);
+  g.push(`<text x="${L-5}" y="${yW0+hW}" fill="#9aa3ad" font-size="10" text-anchor="end">0</text>`);
+  g.push(`<text x="${L+2}" y="${yW0+hW-4}" fill="#d4a5f5" font-size="11">wiatr m/s (przerywana: porywy)</text>`);
+  // ciśnienie (prawa oś, tylko wartości co 12 h)
+  for (let i=0;i<n;i++){ if (localHour(t(i)) === 12 && Number.isFinite(D.pres[i]))
+    g.push(`<text x="${X(i).toFixed(1)}" y="${yC0-2}" fill="#7d8792" font-size="9" text-anchor="middle">${Math.round(D.pres[i]/100)} hPa</text>`); }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif"><rect width="${W}" height="${H}" fill="#12161b"/>${g.join("")}</svg>`;
+}
+
+function srcNote(src){
+  return src === "yr"
+    ? `Prognoza: <a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a> – Norweski Instytut Meteorologiczny i NRK.`
+    : `Prognoza udostępniona bezpłatnie przez serwis <a href="https://www.meteo.pl/" target="_blank" rel="noopener">meteo.pl</a> prowadzony przez ICM UW. Wyniki uzyskano przy użyciu oprogramowania Met Office. Model UM 4 km.`;
+}
+
+async function fillWeather(el, p, src){
+  el.innerHTML = "";
+  if (src === "yr"){
+    const sc = document.createElement("div"); sc.className = "wx-scroll wx-yr";
+    const img = document.createElement("img");
+    img.alt = "Meteogram yr.no – " + p.n; img.referrerPolicy = "no-referrer"; img.loading = "lazy";
+    img.src = yrUrl(p) + "?h=" + Math.floor(Date.now()/WX_MS);
+    img.onerror = () => { sc.className = "wx-msg"; sc.textContent = "Nie udało się pobrać meteogramu yr.no."; };
+    sc.appendChild(img); el.appendChild(sc);
+    el.insertAdjacentHTML("beforeend", `<div class="wx-src">${srcNote("yr")} <a href="${yrPage(p)}" target="_blank" rel="noopener">szczegóły ↗</a></div>`);
+  } else {
+    const sc = document.createElement("div"); sc.className = "wx-scroll wx-icm";
+    sc.innerHTML = `<div class="wx-msg">Ładowanie prognozy ICM…</div>`;
+    el.appendChild(sc);
+    const note = document.createElement("div"); note.className = "wx-src"; note.innerHTML = srcNote("icm");
+    el.appendChild(note);
+    try{
+      const D = await icmData(p);
+      sc.innerHTML = drawICM(D, p);
+      note.innerHTML = `Przebieg modelu: ${fmtRun.format(D.run*1000)}. ` + srcNote("icm") + ` Zaciemnienie = noc; jaśniejsze słupki opadu = śnieg/mieszany; jasne tło słupka = opad maksymalny w okolicy.`;
+    }catch(e){
+      sc.innerHTML = `<div class="wx-msg">Nie udało się pobrać prognozy ICM (${e.message}). <a href="https://app.meteo.pl/" target="_blank" rel="noopener" style="color:var(--accent)">Otwórz meteo.pl ↗</a></div>`;
+    }
+  }
+}
+
+function weatherBox(region, defaultOpen){
+  const places = PLACES.filter(p => p.r === region);
+  if (!places.length) return null;
+  const box = document.createElement("div");
+  box.className = "wx";
+  const openKey = "wxOpen:" + region + ":" + (current==="wszystkie" ? "all" : "reg");
+  if (!store.get(openKey, defaultOpen)) box.classList.add("closed");
+  let place = store.get("wxPlace:" + region, places[0].k);
+  if (!places.some(p=>p.k===place)) place = places[0].k;
+  const head = document.createElement("div"); head.className = "wx-head";
+  const title = document.createElement("div"); title.className = "t";
+  title.innerHTML = `<span class="chev">▾</span>Prognoza`;
+  title.onclick = () => { box.classList.toggle("closed"); store.set(openKey, !box.classList.contains("closed")); if (!box.classList.contains("closed")) load(); };
+  const chips = document.createElement("div"); chips.className = "chips";
+  const srcs = document.createElement("div"); srcs.className = "chips";
+  const body = document.createElement("div"); body.className = "wx-body";
+  const sp = document.createElement("div"); sp.className = "sp";
+  head.append(title, chips, sp, srcs);
+  box.append(head, body);
+  function drawChips(){
+    chips.innerHTML = ""; srcs.innerHTML = "";
+    if (places.length > 1) places.forEach(p => { const b = document.createElement("button"); b.className = "chip" + (p.k===place?" on":""); b.textContent = p.n;
+      b.onclick = () => { place = p.k; store.set("wxPlace:"+region, place); box.classList.remove("closed"); store.set(openKey, true); drawChips(); load(); }; chips.appendChild(b); });
+    else chips.innerHTML = `<span class="chip on" style="cursor:default">${places[0].n}</span>`;
+    [["yr","yr.no"],["icm","ICM UM"]].forEach(([k,l]) => { const b = document.createElement("button"); b.className = "chip" + (wxSrc===k?" on":""); b.textContent = l;
+      b.onclick = () => { wxSrc = k; store.set("wxSrc", k); box.classList.remove("closed"); store.set(openKey, true); refreshWeather(); }; srcs.appendChild(b); });
+  }
+  function load(){ if (box.classList.contains("closed")) return; fillWeather(body, places.find(p=>p.k===place), wxSrc); }
+  box._load = () => { drawChips(); load(); };
+  box._load();
+  return box;
+}
+
+function weatherPage(main){
+  PLACES.forEach(p => {
+    const h = document.createElement("h2"); h.textContent = p.n + " · " + p.r; main.appendChild(h);
+    const grid = document.createElement("div"); grid.className = "wxgrid";
+    ["yr","icm"].forEach(src => {
+      const card = document.createElement("div"); card.className = "wx wxcard";
+      const b = document.createElement("div"); b.className = "wx-body"; b.style.paddingTop = "10px";
+      b.innerHTML = `<h3>${src==="yr" ? "yr.no (48 h)" : "ICM UM 4 km (5 dni)"}</h3>`;
+      const inner = document.createElement("div"); b.appendChild(inner);
+      card.appendChild(b); grid.appendChild(card);
+      card._load = () => fillWeather(inner, p, src);
+      card._load();
+    });
+    main.appendChild(grid);
+  });
+}
+function refreshWeather(){ document.querySelectorAll(".wx").forEach(b => b._load && b._load()); }
+
 /* ---------- tiles ---------- */
 function tile(c){
   const el = document.createElement("div");
@@ -312,11 +576,14 @@ function render(){
   destroyThumbs();
   const main = document.getElementById("main");
   main.innerHTML = "";
+  if (current==="pogoda"){ weatherPage(main); renderTabs(); return; }
   const regions = current==="wszystkie" ? REGIONS : REGIONS.filter(r=>slug(r)===current);
   regions.forEach(r=>{
     const cams = CAMS.filter(c=>c.r===r);
     if (!cams.length) return;
     if (current==="wszystkie"){ const h=document.createElement("h2"); h.textContent=r; main.appendChild(h); }
+    const wx = weatherBox(r, current!=="wszystkie");
+    if (wx) main.appendChild(wx);
     const g = document.createElement("div"); g.className="grid";
     cams.forEach(c=>g.appendChild(tile(c)));
     main.appendChild(g);
@@ -333,7 +600,7 @@ function refreshImages(){
 /* ---------- modal ---------- */
 let modalIdx = -1, modalHls = null;
 function visibleList(){
-  const list = current==="wszystkie" ? CAMS : CAMS.filter(c=>slug(c.r)===current);
+  const list = (current==="wszystkie" || current==="pogoda") ? CAMS : CAMS.filter(c=>slug(c.r)===current);
   return list.slice().sort((a,b)=>REGIONS.indexOf(a.r)-REGIONS.indexOf(b.r) || a.i-b.i);
 }
 function clearModalMedia(){
@@ -410,7 +677,7 @@ document.getElementById("refresh").onclick = () => { refreshImages(); refreshThu
 
 function fromHash(){
   const h = location.hash.slice(1);
-  const valid = ["wszystkie"].concat(REGIONS.map(slug));
+  const valid = ["wszystkie"].concat(REGIONS.map(slug), ["pogoda"]);
   current = valid.includes(h) ? h : store.get("tab","wszystkie");
   if (!valid.includes(current)) current = "wszystkie";
   store.set("tab", current);
@@ -421,10 +688,12 @@ window.addEventListener("hashchange", fromHash);
 // odświeżanie zdjęć + oszczędzanie danych, gdy karta jest ukryta
 setInterval(()=>{ if (!document.hidden) refreshImages(); }, REFRESH_MS);
 let lastThumbs = Date.now();
+let lastWx = Date.now();
+setInterval(()=>{ if (!document.hidden){ refreshWeather(); lastWx = Date.now(); } }, WX_MS);
 setInterval(()=>{ if (!document.hidden && !autoplay){ refreshThumbs(); lastThumbs = Date.now(); } }, THUMB_MS);
 document.addEventListener("visibilitychange", ()=>{
   if (document.hidden){ players.forEach((h,v)=>v.pause()); }
-  else { refreshImages(); if (Date.now()-lastThumbs > THUMB_MS){ refreshThumbs(); lastThumbs = Date.now(); } players.forEach((h,v)=>{ v.play().catch(()=>{}); }); }
+  else { if (Date.now()-lastWx > WX_MS){ refreshWeather(); lastWx = Date.now(); } refreshImages(); if (Date.now()-lastThumbs > THUMB_MS){ refreshThumbs(); lastThumbs = Date.now(); } players.forEach((h,v)=>{ v.play().catch(()=>{}); }); }
 });
 
 fromHash();
