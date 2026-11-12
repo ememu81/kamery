@@ -31,7 +31,6 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Tatry | Kasprowy Wierch – Goryczkowa / Czerwone Wierchy | zdjęcie | kamery.topr.pl/goryczkowa/gorycz.jpg (zapas: …/kwgr.jpeg) |
 | Tatry | Kościelisko – Czerwone Wierchy | zdjęcie | kamery.topr.pl/czwierchy/czwierchy.jpg (nie działa od 29.09) |
 
-Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.pl/<ścieżka>`.
 | Beskid Żywiecki | Rysianka – w kierunku Tatr | wideo HLS | stream.arkomnet.eu/rysianka1 |
 | Beskid Żywiecki | Rysianka – Hala Stopkowa | wideo HLS | stream.arkomnet.eu/rysianka2 |
 | Beskid Żywiecki | Widok na Gminę Węgierska Górka | wideo HLS | stream.arkomnet.eu/wgwidok |
@@ -42,6 +41,8 @@ Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.
 | Pieniny | Schronisko Trzy Korony – Sromowce Niżne | odtwarzacz | static.webcamera.pl … schroniskapieninskie_cam_fb73aa |
 | Pieniny | Jezioro Czorsztyńskie i zamek | odtwarzacz | static.webcamera.pl … niedzica_cam_a6aff0 |
 | Pieniny | Stara Lubowla | odtwarzacz Windy | webcams.windy.com, webcamId=1621786379 |
+
+Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.pl/<ścieżka>`.
 
 ## Ustalenia z testów
 - **TOPR:** nowa strona pogoda.topr.pl (`/download/current/`) przestała się aktualizować 10.11. Nieaktualne kadry widać też na samej stronie TOPR. Aktualne zdjęcia ma stara strona kamery.topr.pl, ale działa ona tylko przez http, więc strona pobiera je przez darmowy pośrednik https **images.weserv.nl**. Przy błędzie przełącza się na zapas z pogoda.topr.pl.
