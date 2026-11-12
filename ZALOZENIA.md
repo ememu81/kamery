@@ -1,6 +1,6 @@
 # Kamery online – założenia i ustalenia
 
-Stan na: 12.11.2026
+Stan na: 12.11.2026 (wieczór)
 
 ## Cel
 Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jednym miejscu, na telefonie i na komputerze.
@@ -8,13 +8,16 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 ## Decyzje
 - **Rozwiązanie:** statyczna strona HTML bez własnego serwera (`index.html`).
 - **Serwer domowy:** na razie nie. Wrócimy do niego tylko wtedy, gdy będzie potrzebne archiwum kadrów, powiadomienia albo pośredniczenie dla zablokowanych kamer. Wtedy wyłącznie przez Tailscale lub WireGuard, bez otwierania portów na routerze. Ewentualnie Cloudflare Tunnel z logowaniem (Cloudflare Access).
-- **Hosting:** GitHub Pages (darmowy, https, działa na telefonie i na komputerze). Artefakt Claude odpada, bo nie może wczytywać obrazu z zewnętrznych serwerów.
+- **Hosting:** GitHub Pages, https://ememu81.github.io/kamery/, repozytorium `ememu81/kamery` (darmowy, https, działa na telefonie i na komputerze). Artefakt Claude odpada, bo nie może wczytywać obrazu z zewnętrznych serwerów.
 - **Wybór kamer:** 21 z 62 sprawdzonych, zaznaczonych w arkuszu „Kamery online – wybór kamer” (https://claude.ai/artifact/8MP8WFj3tjJbamdySi7ZD1).
 
 ## Działanie strony
 - Zakładki: Wszystkie / Tatry / Beskid Żywiecki / Gorce / Pieniny.
 - Zdjęcia (TOPR) odświeżają się co 5 minut i po powrocie do karty. Jest też przycisk „Odśwież”.
 - Wideo i odtwarzacze startują dopiero po stuknięciu, żeby oszczędzać dane (strumień to ok. 2 Mb/s). Przełącznik „wideo w kafelkach” włącza odtwarzanie wszystkich naraz i jest zapamiętywany.
+- Przełącznik „miniatury wideo” (domyślnie włączony na komputerze, wyłączony na telefonie): z każdego strumienia HLS pobierana jest jedna klatka, odświeżana co 10 min (ok. 1 MB na kamerę), a odtwarzacze webcamera.pl i Windy ładują się w kafelku i pokazują swój podgląd. Żywiec Rynek 1 i 3 (stream360) nie mają podglądu, bo ich odtwarzacz przed kliknięciem pokazuje tylko herb.
+- Wideo odtwarzane jest przez hls.js. Natywny odtwarzacz HLS jest tylko zapasem, bo w nowszym Chrome nie radził sobie z częścią strumieni.
+- Przy zdjęciach TOPR jest napis „sprawdzono HH:MM”, czyli godzina pobrania. Godzina wykonania zdjęcia jest wypalona w jego rogu.
 - Pełny ekran: strzałki, przesunięcie palcem (dla zdjęć), Esc. Link „źródło” prowadzi do strony właściciela kamery.
 - Gdy strumienia nie da się odtworzyć, kafelek pokazuje komunikat i link do strony źródłowej.
 
@@ -41,13 +44,15 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 ## Ustalenia z testów
 - **TOPR:** stara strona kamery.topr.pl działa tylko przez http. Strona na https (np. GitHub Pages) by jej nie wczytała, dlatego używamy obrazów z nowej strony pogoda.topr.pl (https, 1024×576).
 - **arkomnet** (Rysianka, WGmedia): strumienie działają poza stronami źródłowymi.
-- **Ochotnica (epicserv):** serwer wpuszcza tylko wybrane strony (działało z rysianka.pl, było blokowane z zywiec.pl). **Do sprawdzenia po publikacji na GitHub Pages.**
+- **Ochotnica (epicserv):** serwer wpuszcza tylko wybrane strony (blokuje np. zywiec.pl), ale z ememu81.github.io działa (sprawdzone 12.11).
 - **webcamera.pl / stream360 / Windy:** odtwarzacze ładują się na innych stronach. stream360 wymaga kliknięcia, webcamera.pl ma swój baner.
 - Strona Trzy Korony błędnie opisuje odtwarzacze. Jezioro Czorsztyńskie to `niedzica_cam_a6aff0`, a `czorsztynski_cam_*` to stok Czorsztyn Ski.
 
 ## Do zrobienia
-- [ ] Wrzucić `index.html` na GitHub Pages i dodać skrót na ekran główny telefonu.
-- [ ] Sprawdzić kamery z Gorców (epicserv) pod docelowym adresem.
+- [x] Strona na GitHub Pages: https://ememu81.github.io/kamery/ (repozytorium ememu81/kamery, zmiany commituje Claude).
+- [x] Kamery z Gorców działają pod docelowym adresem.
+- [ ] Dodać skrót na ekran główny telefonu.
+- [ ] Obserwować kamery TOPR, które 12.11 pokazywały zdjęcia z 10.11 (Kościelisko jeszcze starsze).
 - [ ] Opcjonalnie: godziny wschodu i zachodu słońca, prognoza przy regionach, archiwum kadrów (wymaga serwera).
 
 ## Uwagi prawne
