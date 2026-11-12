@@ -30,7 +30,6 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Tatry | Kasprowy Wierch – Świnica | zdjęcie | kamery.topr.pl/gasienicowa/gasie.jpg (zapas: …/kwgs.jpeg) |
 | Tatry | Kasprowy Wierch – Goryczkowa / Czerwone Wierchy | zdjęcie | kamery.topr.pl/goryczkowa/gorycz.jpg (zapas: …/kwgr.jpeg) |
 | Tatry | Kościelisko – Czerwone Wierchy | zdjęcie | kamery.topr.pl/czwierchy/czwierchy.jpg (nie działa od 29.09) |
-
 | Beskid Żywiecki | Rysianka – w kierunku Tatr | wideo HLS | stream.arkomnet.eu/rysianka1 |
 | Beskid Żywiecki | Rysianka – Hala Stopkowa | wideo HLS | stream.arkomnet.eu/rysianka2 |
 | Beskid Żywiecki | Widok na Gminę Węgierska Górka | wideo HLS | stream.arkomnet.eu/wgwidok |
