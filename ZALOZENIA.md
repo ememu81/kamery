@@ -9,10 +9,11 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 - **Rozwiązanie:** statyczna strona HTML bez własnego serwera (`index.html`).
 - **Serwer domowy:** na razie nie. Wrócimy do niego tylko wtedy, gdy będzie potrzebne archiwum kadrów, powiadomienia albo pośredniczenie dla zablokowanych kamer. Wtedy wyłącznie przez Tailscale lub WireGuard, bez otwierania portów na routerze. Ewentualnie Cloudflare Tunnel z logowaniem (Cloudflare Access).
 - **Hosting:** GitHub Pages, https://ememu81.github.io/kamery/, repozytorium `ememu81/kamery` (darmowy, https, działa na telefonie i na komputerze). Artefakt Claude odpada, bo nie może wczytywać obrazu z zewnętrznych serwerów.
-- **Wybór kamer:** 21 z 62 sprawdzonych, zaznaczonych w arkuszu „Kamery online – wybór kamer” (https://claude.ai/artifact/8MP8WFj3tjJbamdySi7ZD1).
+- **Wybór kamer:** 21 z 62 sprawdzonych + Koniaków – Centrum (Ochodzita) dodany 12.11; 22 kamery, zaznaczonych w arkuszu „Kamery online – wybór kamer” (https://claude.ai/artifact/8MP8WFj3tjJbamdySi7ZD1).
 
 ## Działanie strony
-- Zakładki: Wszystkie / Beskid Żywiecki / Tatry / Gorce / Pieniny (w tej kolejności są też sekcje na stronie).
+- Zakładki: Wszystkie / Beskidy / Tatry / Gorce / Pieniny / Pogoda (w tej kolejności są też sekcje na stronie).
+- **Prognozy:** nad kamerami regionu jest zwijany pasek „Prognoza” z wyborem punktu i źródła (yr.no / ICM UM). Zakładka „Pogoda” pokazuje wszystkie punkty z oboma źródłami obok siebie. Prognozy odświeżają się co godzinę. W widoku „Wszystkie” paski są domyślnie zwinięte, a stan zwinięcia, wybrany punkt i źródło są zapamiętywane.
 - Zdjęcia (TOPR) odświeżają się co 5 minut i po powrocie do karty. Jest też przycisk „Odśwież”.
 - Wideo i odtwarzacze startują dopiero po stuknięciu, żeby oszczędzać dane (strumień to ok. 2 Mb/s). Przełącznik „wideo w kafelkach” włącza odtwarzanie wszystkich naraz i jest zapamiętywany.
 - Przełącznik „miniatury wideo” (domyślnie włączony na komputerze, wyłączony na telefonie): z każdego strumienia HLS pobierana jest jedna klatka, odświeżana co 10 min (ok. 1 MB na kamerę), a odtwarzacze webcamera.pl i Windy ładują się w kafelku i pokazują swój podgląd. Żywiec Rynek 1 i 3 (stream360) nie mają podglądu, bo ich odtwarzacz przed kliknięciem pokazuje tylko herb.
@@ -30,16 +31,29 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Tatry | Kasprowy Wierch – Świnica | zdjęcie | kamery.topr.pl/gasienicowa/gasie.jpg (zapas: …/kwgs.jpeg) |
 | Tatry | Kasprowy Wierch – Goryczkowa / Czerwone Wierchy | zdjęcie | kamery.topr.pl/goryczkowa/gorycz.jpg (zapas: …/kwgr.jpeg) |
 | Tatry | Kościelisko – Czerwone Wierchy | zdjęcie | kamery.topr.pl/czwierchy/czwierchy.jpg (nie działa od 29.09) |
-| Beskid Żywiecki | Rysianka – w kierunku Tatr | wideo HLS | stream.arkomnet.eu/rysianka1 |
-| Beskid Żywiecki | Rysianka – Hala Stopkowa | wideo HLS | stream.arkomnet.eu/rysianka2 |
-| Beskid Żywiecki | Widok na Gminę Węgierska Górka | wideo HLS | stream.arkomnet.eu/wgwidok |
-| Beskid Żywiecki | Cisiec – Wyciąg Za Groniem | wideo HLS | stream.arkomnet.eu/xxx_wyciag_III |
-| Beskid Żywiecki | Żywiec – Rynek 1 i 3 | odtwarzacz | stream360.pl/v/Zywiec1/index1.php, index3.php |
-| Beskid Żywiecki | Żywiec – Rynek 2, Średni Grojec | odtwarzacz | player.webcamera.pl (zywiec_cam_f0027b, zywiec_cam_1ce519) |
+| Beskidy | Koniaków – Centrum (Ochodzita) | wideo HLS | polineo.pl:5443/LiveApp/streams/480833538014407854235726.m3u8 (strona: istebna.eu) |
+| Beskidy | Rysianka – w kierunku Tatr | wideo HLS | stream.arkomnet.eu/rysianka1 |
+| Beskidy | Rysianka – Hala Stopkowa | wideo HLS | stream.arkomnet.eu/rysianka2 |
+| Beskidy | Widok na Gminę Węgierska Górka | wideo HLS | stream.arkomnet.eu/wgwidok |
+| Beskidy | Cisiec – Wyciąg Za Groniem | wideo HLS | stream.arkomnet.eu/xxx_wyciag_III |
+| Beskidy | Żywiec – Rynek 1 i 3 | odtwarzacz | stream360.pl/v/Zywiec1/index1.php, index3.php |
+| Beskidy | Żywiec – Rynek 2, Średni Grojec | odtwarzacz | player.webcamera.pl (zywiec_cam_f0027b, zywiec_cam_1ce519) |
 | Gorce | Suchy Groń, Magurki, Lubań, Gorc | wideo HLS | ochotnica.epicserv.pl/streams/cam5, cam1, cam3, cam4 |
 | Pieniny | Schronisko Trzy Korony – Sromowce Niżne | odtwarzacz | static.webcamera.pl … schroniskapieninskie_cam_fb73aa |
 | Pieniny | Jezioro Czorsztyńskie i zamek | odtwarzacz | static.webcamera.pl … niedzica_cam_a6aff0 |
 | Pieniny | Stara Lubowla | odtwarzacz Windy | webcams.windy.com, webcamId=1621786379 |
+
+## Punkty prognozy
+| Punkt | Region | Współrzędne |
+|---|---|---|
+| Hala Rysianka | Beskidy | 49.5409, 19.1306 |
+| Babia Góra | Beskidy | 49.5732, 19.5294 |
+| Ochodzita | Beskidy | 49.5456, 18.9551 |
+| Kasprowy Wierch | Tatry | 49.2318, 19.9817 |
+| Trzy Korony | Pieniny | 49.4147, 20.4122 |
+
+- **yr.no:** gotowy meteogram SVG na 48 h: `https://www.yr.no/en/content/<lat>,<lon>/meteogram.svg`.
+- **ICM (meteo.pl), model UM 4 km, 5 dni:** stare obrazki `mgram_pict.php` zwracają już tylko reklamę nowej aplikacji, więc meteorogram jest rysowany na stronie (SVG) z danych API aplikacji Meteo ICM: `GET https://devmgramapi.meteo.pl/meteorograms/available` oraz `POST …/meteorograms/um4_120` z `{point:{lat,lon}, date:<przebieg>}`. Działa z ememu81.github.io (CORS), ale to **nieoficjalne API aplikacji**, które może się zmienić. Pod wykresem jest wymagany przez ICM podpis źródła; strona nie może mieć reklam.
 
 Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.pl/<ścieżka>`.
 
@@ -57,7 +71,9 @@ Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.
 - [ ] Dodać skrót na ekran główny telefonu.
 - [x] Nieaktualne zdjęcia TOPR: źródło zmienione na kamery.topr.pl przez images.weserv.nl (12.11).
 - [ ] Zdecydować, czy zostawić Kościelisko (nie działa od 29.09) albo zamienić je na inną kamerę.
-- [ ] Opcjonalnie: godziny wschodu i zachodu słońca, prognoza przy regionach, archiwum kadrów (wymaga serwera).
+- [x] Prognozy yr.no + ICM dla 5 punktów (12.11).
+- [ ] Gorce nie mają jeszcze punktu prognozy (np. Turbacz / Lubań).
+- [ ] Opcjonalnie: archiwum kadrów (wymaga serwera).
 
 ## Uwagi prawne
 Do prywatnego podglądu wszystko jest w porządku. Przed publicznym udostępnianiem strony warto sprawdzić regulaminy portali, bo niektóre zabraniają osadzania obrazu bez zgody.
