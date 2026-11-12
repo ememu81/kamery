@@ -24,12 +24,14 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 ## Źródła wybranych kamer
 | Region | Kamera | Rodzaj | Źródło obrazu |
 |---|---|---|---|
-| Tatry | Morskie Oko – Mnich | zdjęcie | pogoda.topr.pl/download/current/momn.jpeg |
-| Tatry | Hala Gąsienicowa – Granaty | zdjęcie | …/hala.jpeg |
-| Tatry | Hala Gąsienicowa – Kasprowy Wierch | zdjęcie | …/hgkw.jpeg |
-| Tatry | Kasprowy Wierch – Świnica | zdjęcie | …/kwgs.jpeg |
-| Tatry | Kasprowy Wierch – Goryczkowa / Czerwone Wierchy | zdjęcie | …/kwgr.jpeg |
-| Tatry | Kościelisko – Czerwone Wierchy | zdjęcie | …/kscw.jpeg |
+| Tatry | Morskie Oko – Mnich | zdjęcie | kamery.topr.pl/moko_TPN/moko_02.jpg (zapas: pogoda.topr.pl/download/current/momn.jpeg) |
+| Tatry | Hala Gąsienicowa – Granaty | zdjęcie | kamery.topr.pl/hala/hala.jpg (zapas: …/hala.jpeg) |
+| Tatry | Hala Gąsienicowa – Kasprowy Wierch | zdjęcie | kamery.topr.pl/hala2/hala2.jpg (zapas: …/hgkw.jpeg) |
+| Tatry | Kasprowy Wierch – Świnica | zdjęcie | kamery.topr.pl/gasienicowa/gasie.jpg (zapas: …/kwgs.jpeg) |
+| Tatry | Kasprowy Wierch – Goryczkowa / Czerwone Wierchy | zdjęcie | kamery.topr.pl/goryczkowa/gorycz.jpg (zapas: …/kwgr.jpeg) |
+| Tatry | Kościelisko – Czerwone Wierchy | zdjęcie | kamery.topr.pl/czwierchy/czwierchy.jpg (nie działa od 29.09) |
+
+Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.pl/<ścieżka>`.
 | Beskid Żywiecki | Rysianka – w kierunku Tatr | wideo HLS | stream.arkomnet.eu/rysianka1 |
 | Beskid Żywiecki | Rysianka – Hala Stopkowa | wideo HLS | stream.arkomnet.eu/rysianka2 |
 | Beskid Żywiecki | Widok na Gminę Węgierska Górka | wideo HLS | stream.arkomnet.eu/wgwidok |
@@ -42,7 +44,8 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Pieniny | Stara Lubowla | odtwarzacz Windy | webcams.windy.com, webcamId=1621786379 |
 
 ## Ustalenia z testów
-- **TOPR:** stara strona kamery.topr.pl działa tylko przez http. Strona na https (np. GitHub Pages) by jej nie wczytała, dlatego używamy obrazów z nowej strony pogoda.topr.pl (https, 1024×576).
+- **TOPR:** nowa strona pogoda.topr.pl (`/download/current/`) przestała się aktualizować 10.11. Nieaktualne kadry widać też na samej stronie TOPR. Aktualne zdjęcia ma stara strona kamery.topr.pl, ale działa ona tylko przez http, więc strona pobiera je przez darmowy pośrednik https **images.weserv.nl**. Przy błędzie przełącza się na zapas z pogoda.topr.pl.
+- **Kościelisko – Czerwone Wierchy:** kamera nie działa od 29.09.2026 (ostatni kadr ma tę datę w obu źródłach).
 - **arkomnet** (Rysianka, WGmedia): strumienie działają poza stronami źródłowymi.
 - **Ochotnica (epicserv):** serwer wpuszcza tylko wybrane strony (blokuje np. zywiec.pl), ale z ememu81.github.io działa (sprawdzone 12.11).
 - **webcamera.pl / stream360 / Windy:** odtwarzacze ładują się na innych stronach. stream360 wymaga kliknięcia, webcamera.pl ma swój baner.
@@ -52,7 +55,8 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 - [x] Strona na GitHub Pages: https://ememu81.github.io/kamery/ (repozytorium ememu81/kamery, zmiany commituje Claude).
 - [x] Kamery z Gorców działają pod docelowym adresem.
 - [ ] Dodać skrót na ekran główny telefonu.
-- [ ] Obserwować kamery TOPR, które 12.11 pokazywały zdjęcia z 10.11 (Kościelisko jeszcze starsze).
+- [x] Nieaktualne zdjęcia TOPR: źródło zmienione na kamery.topr.pl przez images.weserv.nl (12.11).
+- [ ] Zdecydować, czy zostawić Kościelisko (nie działa od 29.09) albo zamienić je na inną kamerę.
 - [ ] Opcjonalnie: godziny wschodu i zachodu słońca, prognoza przy regionach, archiwum kadrów (wymaga serwera).
 
 ## Uwagi prawne
