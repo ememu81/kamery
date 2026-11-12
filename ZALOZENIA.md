@@ -50,6 +50,7 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Babia Góra | Beskidy | 49.5732, 19.5294 |
 | Ochodzita | Beskidy | 49.5456, 18.9551 |
 | Kasprowy Wierch | Tatry | 49.2318, 19.9817 |
+| Lubań | Gorce | 49.4878, 20.3420 |
 | Trzy Korony | Pieniny | 49.4147, 20.4122 |
 
 - **yr.no:** gotowy meteogram SVG na 48 h: `https://www.yr.no/en/content/<lat>,<lon>/meteogram.svg`.
@@ -71,8 +72,8 @@ Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.
 - [ ] Dodać skrót na ekran główny telefonu.
 - [x] Nieaktualne zdjęcia TOPR: źródło zmienione na kamery.topr.pl przez images.weserv.nl (12.11).
 - [ ] Zdecydować, czy zostawić Kościelisko (nie działa od 29.09) albo zamienić je na inną kamerę.
-- [x] Prognozy yr.no + ICM dla 5 punktów (12.11).
-- [ ] Gorce nie mają jeszcze punktu prognozy (np. Turbacz / Lubań).
+- [x] Prognozy yr.no + ICM dla 6 punktów (12.11).
+- [x] Gorce: punkt prognozy Lubań (12.11).
 - [ ] Opcjonalnie: archiwum kadrów (wymaga serwera).
 
 ## Uwagi prawne
