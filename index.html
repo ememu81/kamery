@@ -95,6 +95,10 @@
   .wx-src{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
   .wx-src a{color:var(--muted)}
   .wxgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),740px))}
+  .wxmap{max-width:740px}
+  .wxmap .wx-head .t{cursor:default}
+  .wxmap iframe{display:block;width:100%;height:440px;border:0;border-radius:8px;background:#0a0c0f}
+  @media (max-width:520px){.wxmap iframe{height:340px}}
   .wxcard h3{font-size:13px;margin:0 0 6px;color:var(--muted);font-weight:600}
   footer{color:var(--muted);font-size:12px;padding:6px 16px 24px;text-align:center}
   footer a{color:var(--muted)}
@@ -590,7 +594,35 @@ function weatherBox(region, defaultOpen){
   return box;
 }
 
+const MAP_LAYERS = [["radar","Radar opadów"],["satellite","Satelita"],["clouds","Chmury (prognoza)"]];
+const windyUrl = ov => `https://embed.windy.com/embed2.html?lat=49.40&lon=19.70&detailLat=49.40&detailLon=19.70&zoom=7&level=surface&overlay=${ov}&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+function weatherMap(main){
+  let layer = store.get("wxMap", "radar");
+  if (!MAP_LAYERS.some(([k])=>k===layer)) layer = "radar";
+  const box = document.createElement("div"); box.className = "wx wxmap";
+  const head = document.createElement("div"); head.className = "wx-head";
+  head.innerHTML = `<div class="t">Mapa</div>`;
+  const chips = document.createElement("div"); chips.className = "chips";
+  head.appendChild(chips);
+  const body = document.createElement("div"); body.className = "wx-body";
+  const f = document.createElement("iframe"); f.loading = "lazy"; f.title = "Mapa Windy"; f.allow = "fullscreen";
+  const note = document.createElement("div"); note.className = "wx-src";
+  note.innerHTML = `Mapa: <a href="https://www.windy.com/?49.40,19.70,7" target="_blank" rel="noopener">Windy.com</a>. Radar i satelita – dane bieżące (przycisk ▶ odtwarza ostatnie godziny; w nocy chmury z satelity widać w kanale INF), chmury – prognoza modelu z suwakiem czasu.`;
+  body.append(f, note);
+  box.append(head, body);
+  function draw(){
+    chips.innerHTML = "";
+    MAP_LAYERS.forEach(([k,l]) => { const b = document.createElement("button"); b.className = "chip" + (k===layer?" on":""); b.textContent = l;
+      b.onclick = () => { layer = k; store.set("wxMap", k); draw(); }; chips.appendChild(b); });
+    f.src = windyUrl(layer);
+  }
+  box._load = () => { f.src = windyUrl(layer); };
+  draw();
+  main.appendChild(box);
+}
+
 function weatherPage(main){
+  weatherMap(main);
   PLACES.forEach(p => {
     const h = document.createElement("h2"); h.textContent = p.n + " · " + p.r; main.appendChild(h);
     const grid = document.createElement("div"); grid.className = "wxgrid";
