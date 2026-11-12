@@ -51,7 +51,9 @@
     border:1px solid rgba(124,196,255,.5);display:flex;align-items:center;justify-content:center}
   .play:after{content:"";border-left:14px solid var(--accent);border-top:9px solid transparent;
     border-bottom:9px solid transparent;margin-left:4px}
-  .badge{position:absolute;top:8px;left:8px;font-size:11px;padding:2px 7px;border-radius:20px;
+  .ph.overlay{background:rgba(0,0,0,.15);z-index:1}
+  .ph.overlay .play{background:rgba(0,0,0,.45)}
+  .badge{position:absolute;z-index:2;top:8px;left:8px;font-size:11px;padding:2px 7px;border-radius:20px;
     background:rgba(0,0,0,.6);color:#fff;letter-spacing:.3px}
   .badge.live{background:rgba(220,40,40,.85)}
   .meta{display:flex;align-items:baseline;gap:8px;padding:8px 10px}
@@ -82,12 +84,15 @@
     <label class="toggle" title="Odtwarza strumienie wideo bezpośrednio w kafelkach (zużywa dużo danych)">
       <input type="checkbox" id="autoplay"> wideo w kafelkach
     </label>
+    <label class="toggle" title="Pokazuje jedną klatkę z każdego strumienia, odświeżaną co 10 min (ok. 1 MB na kamerę)">
+      <input type="checkbox" id="thumbs"> miniatury wideo
+    </label>
     <button class="btn" id="refresh" title="Pobierz najnowsze zdjęcia">↻ Odśwież</button>
   </div>
   <nav id="tabs"></nav>
 </header>
 <main id="main"></main>
-<footer>Zdjęcia odświeżają się co 5 min. Obraz należy do właścicieli kamer – kliknij „źródło”, aby przejść na ich stronę.</footer>
+<footer>Zdjęcia odświeżają się co 5 min, miniatury wideo co 10 min. Godzina wykonania zdjęcia jest w jego rogu. Obraz należy do właścicieli kamer – kliknij „źródło”, aby przejść na ich stronę.</footer>
 
 <div class="modal" id="modal">
   <div class="mbar">
@@ -122,9 +127,9 @@ const CAMS = [
   {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Hali Stopkowej", t:"hls", s:"https://stream.arkomnet.eu/rysianka2/index.m3u8", p:"https://rysianka.pl/"},
   {r:"Beskid Żywiecki", n:"Widok na Gminę Węgierska Górka", t:"hls", s:"https://stream.arkomnet.eu/wgwidok/index.m3u8", p:"https://www.wgmedia.eu/kamery/widok-na-gmine-wegierska-gorka-z-baraniej"},
   {r:"Beskid Żywiecki", n:"Cisiec – Wyciąg Za Groniem", t:"hls", s:"https://stream.arkomnet.eu/xxx_wyciag_III/index.m3u8", p:"https://www.wgmedia.eu/kamery/cisiec-wyciag-za-groniem"},
-  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 1", t:"embed", s:"https://stream360.pl/v/Zywiec1/index1.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 1", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index1.php", p:"https://zywiec.pl/kamery"},
   {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 2", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_f0027b", p:"https://zywiec.pl/kamery"},
-  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 3", t:"embed", s:"https://stream360.pl/v/Zywiec1/index3.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 3", t:"embed", thumb:false, s:"https://stream360.pl/v/Zywiec1/index3.php", p:"https://zywiec.pl/kamery"},
   {r:"Beskid Żywiecki", n:"Żywiec – widok ze Średniego Grojca", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_1ce519", p:"https://zywiec.pl/kamery"},
 
   // --- Gorce (Ochotnica Dolna) ---
@@ -153,6 +158,9 @@ const canNativeHls = document.createElement("video").canPlayType("application/vn
 CAMS.forEach((c,i)=>c.i=i);
 let current = "wszystkie";
 let autoplay = store.get("autoplay", false);
+const isMobile = matchMedia("(pointer:coarse)").matches || innerWidth < 700;
+let thumbs = store.get("thumbs", !isMobile);
+const THUMB_MS = 10*60*1000;
 const players = new Map(); // tile video -> hls instance
 
 /* ---------- tabs ---------- */
@@ -201,6 +209,44 @@ function showBlocked(container, c){
   container.appendChild(d);
 }
 
+/* ---------- miniatury wideo: jedna klatka ze strumienia ---------- */
+let thumbList = [];
+function stopThumb(t){
+  if (t.timer){ clearTimeout(t.timer); t.timer = null; }
+  if (t.h){ try{ t.h.destroy(); }catch(e){} t.h = null; }
+}
+function grabThumb(t){
+  stopThumb(t);
+  const {v, info} = t;
+  v.autoplay = true;
+  let done = false;
+  const finish = ok => {
+    if (done) return; done = true;
+    if (t.timer){ clearTimeout(t.timer); t.timer = null; }
+    try{ v.pause(); }catch(e){}
+    if (t.h){ try{ t.h.stopLoad(); }catch(e){} }   // zatrzymaj pobieranie, klatka zostaje
+    if (ok){ info.textContent = "podgląd " + hhmm(new Date()); info.classList.remove("err"); }
+    else   { info.textContent = "brak podglądu"; info.classList.add("err"); }
+  };
+  v.onplaying = () => setTimeout(() => finish(true), 300);
+  v.onerror = () => finish(false);
+  v.addEventListener("hlsfatal", () => finish(false), {once:true});
+  t.timer = setTimeout(() => finish(v.readyState >= 2), 15000);
+  if (canNativeHls){ v.src = t.c.s; }
+  else if (window.Hls && Hls.isSupported()){
+    const h = new Hls({maxBufferLength:2, maxMaxBufferLength:4, capLevelToPlayerSize:true, startLevel:0});
+    h.on(Hls.Events.ERROR, (e,d)=>{ if(d.fatal) v.dispatchEvent(new Event("hlsfatal")); });
+    h.loadSource(t.c.s); h.attachMedia(v);
+    t.h = h;
+  } else { v.src = t.c.s; }
+  v.play().catch(()=>{});
+}
+function destroyThumbs(){
+  thumbList.forEach(t=>{ stopThumb(t); try{ t.v.removeAttribute("src"); t.v.load(); }catch(e){} });
+  thumbList = [];
+}
+function refreshThumbs(){ thumbList.forEach(grabThumb); }
+
 /* ---------- tiles ---------- */
 function tile(c){
   const el = document.createElement("div");
@@ -217,7 +263,8 @@ function tile(c){
     frame.innerHTML = `<span class="badge">zdjęcie</span>`;
     const img = document.createElement("img");
     img.loading = "lazy"; img.alt = c.n; img.referrerPolicy = "no-referrer";
-    img.onload = () => { info.textContent = "pobrano " + hhmm(new Date()); info.classList.remove("err"); };
+    img.title = "Godzina wykonania zdjęcia jest w jego rogu";
+    img.onload = () => { info.textContent = "sprawdzono " + hhmm(new Date()); info.classList.remove("err"); };
     img.onerror = () => { info.textContent = "brak obrazu"; info.classList.add("err"); };
     img.dataset.src = c.s;
     img.src = bust(c.s);
@@ -232,11 +279,21 @@ function tile(c){
     v.addEventListener("hlsfatal", fail);
     v.addEventListener("error", fail);
     info.textContent = "wideo";
-  } else if (c.t === "embed" && autoplay){
+  } else if (c.t === "embed" && (autoplay || (thumbs && c.thumb !== false))){
     const f = document.createElement("iframe");
-    f.src = c.s; f.loading = "lazy"; f.allow = "autoplay; fullscreen"; f.referrerPolicy = "no-referrer";
+    f.src = autoplay ? c.s : c.s.replace("autoPlay=1","autoPlay=0");
+    f.loading = "lazy"; f.allow = "autoplay; fullscreen"; f.referrerPolicy = "no-referrer";
     frame.appendChild(f);
     info.textContent = "odtwarzacz";
+  } else if (c.t === "hls" && thumbs){
+    const v = document.createElement("video");
+    v.muted = true; v.playsInline = true; v.setAttribute("playsinline",""); v.preload = "auto";
+    frame.appendChild(v);
+    frame.insertAdjacentHTML("beforeend", `<div class="ph overlay"><div class="play"></div></div><span class="badge">podgląd</span>`);
+    info.textContent = "ładowanie…";
+    const t = {v, c, info, frame, h:null};
+    thumbList.push(t);
+    grabThumb(t);
   } else {
     frame.innerHTML = `<div class="ph"><div class="play"></div><div>${c.t==="hls" ? "wideo na żywo" : "odtwarzacz dostawcy"} – stuknij</div></div>`;
     info.textContent = c.t==="hls" ? "wideo" : "odtwarzacz";
@@ -248,6 +305,7 @@ function tile(c){
 
 function render(){
   destroyTilePlayers();
+  destroyThumbs();
   const main = document.getElementById("main");
   main.innerHTML = "";
   const regions = current==="wszystkie" ? REGIONS : REGIONS.filter(r=>slug(r)===current);
@@ -339,7 +397,10 @@ document.getElementById("mbody").addEventListener("touchend",e=>{
 const ap = document.getElementById("autoplay");
 ap.checked = autoplay;
 ap.onchange = () => { autoplay = ap.checked; store.set("autoplay", autoplay); render(); };
-document.getElementById("refresh").onclick = refreshImages;
+const th = document.getElementById("thumbs");
+th.checked = thumbs;
+th.onchange = () => { thumbs = th.checked; store.set("thumbs", thumbs); render(); };
+document.getElementById("refresh").onclick = () => { refreshImages(); refreshThumbs(); };
 
 function fromHash(){
   const h = location.hash.slice(1);
@@ -353,9 +414,11 @@ window.addEventListener("hashchange", fromHash);
 
 // odświeżanie zdjęć + oszczędzanie danych, gdy karta jest ukryta
 setInterval(()=>{ if (!document.hidden) refreshImages(); }, REFRESH_MS);
+let lastThumbs = Date.now();
+setInterval(()=>{ if (!document.hidden && !autoplay){ refreshThumbs(); lastThumbs = Date.now(); } }, THUMB_MS);
 document.addEventListener("visibilitychange", ()=>{
   if (document.hidden){ players.forEach((h,v)=>v.pause()); }
-  else { refreshImages(); players.forEach((h,v)=>{ v.play().catch(()=>{}); }); }
+  else { refreshImages(); if (Date.now()-lastThumbs > THUMB_MS){ refreshThumbs(); lastThumbs = Date.now(); } players.forEach((h,v)=>{ v.play().catch(()=>{}); }); }
 });
 
 fromHash();
