@@ -387,11 +387,11 @@ function drawICM(D, p){
     let up = "", dn = "";
     for (let i=0;i<n;i++){ if (Number.isFinite(D.tmax[i])) up += (up?"L":"M") + X(i).toFixed(1)+" "+YT(D.tmax[i]).toFixed(1)+" "; }
     for (let i=n-1;i>=0;i--){ if (Number.isFinite(D.tmin[i])) dn += "L" + X(i).toFixed(1)+" "+YT(D.tmin[i]).toFixed(1)+" "; }
-    g.push(`<path d="${up}${dn}Z" fill="#ff6b6b" opacity=".16"/>`);
+    g.push(`<path d="${up}${dn}Z" fill="#ff6b6b" opacity=".10"/>`);
   }
   g.push(`<path d="${path(D.dew, YT)}" fill="none" stroke="#5fd18b" stroke-width="1.3" stroke-dasharray="3 3"/>`);
   g.push(`<path d="${path(D.temp, YT)}" fill="none" stroke="#ff6b6b" stroke-width="2"/>`);
-  g.push(`<text x="${L}" y="${yT0+12}" fill="#ff8a8a" font-size="11">temperatura °C</text>`);
+  g.push(`<text x="${L+2}" y="${yT0+12}" fill="#ff8a8a" font-size="11">temperatura °C · zielona: punkt rosy · tło: rozrzut w okolicy</text>`);
   // zachmurzenie
   for (let i=0;i<n;i++){ const c = D.cld[i]; if (!Number.isFinite(c)) continue;
     const x = X(i) - (W-L-R)/(n-1)/2;
@@ -412,17 +412,18 @@ function drawICM(D, p){
   g.push(`<text x="${L-5}" y="${yP0+hP}" fill="#9aa3ad" font-size="10" text-anchor="end">0</text>`);
   g.push(`<text x="${L+2}" y="${yP0+11}" fill="#7fbfff" font-size="11">opad mm/h</text>`);
   // wiatr
-  const wmax = Math.max(5, ...fin(D.gust.concat(D.wind)));
+  const wmax = Math.ceil(Math.max(5, Math.max(...fin(D.wind))*2));
+  const gustC = D.gust.map(v => Number.isFinite(v) ? Math.min(v, wmax) : v);
   const YW = v => yW0 + hW - v/wmax*hW;
   g.push(`<line x1="${L}" x2="${W-R}" y1="${yW0+hW}" y2="${yW0+hW}" stroke="#2a3039"/>`);
-  g.push(`<path d="${path(D.gust, YW)}" fill="none" stroke="#c792ea" stroke-width="1.2" stroke-dasharray="4 3" opacity=".8"/>`);
+  g.push(`<path d="${path(gustC, YW)}" fill="none" stroke="#c792ea" stroke-width="1.2" stroke-dasharray="4 3" opacity=".8"/>`);
   g.push(`<path d="${path(D.wind, YW)}" fill="none" stroke="#c792ea" stroke-width="2"/>`);
   for (let i=1;i<n-1;i+=3){ const dr = D.dir[i]; if (!Number.isFinite(dr)) continue;
     const x = X(i), y = yW0 + 8;
     g.push(`<g transform="translate(${x.toFixed(1)},${y}) rotate(${(dr+180).toFixed(0)})"><path d="M0 -6 L3 2 L0 0 L-3 2 Z" fill="#c9d1d9" opacity=".85"/></g>`); }
   g.push(`<text x="${L-5}" y="${yW0+10}" fill="#9aa3ad" font-size="10" text-anchor="end">${Math.round(wmax)}</text>`);
   g.push(`<text x="${L-5}" y="${yW0+hW}" fill="#9aa3ad" font-size="10" text-anchor="end">0</text>`);
-  g.push(`<text x="${L+2}" y="${yW0+hW-4}" fill="#d4a5f5" font-size="11">wiatr m/s (przerywana: porywy)</text>`);
+  g.push(`<text x="${W-R}" y="${yW0+hW-4}" fill="#d4a5f5" font-size="11" text-anchor="end">wiatr m/s · przerywana: porywy (maks. ${Math.round(Math.max(...fin(D.gust)))} m/s)</text>`);
   // ciśnienie (prawa oś, tylko wartości co 12 h)
   for (let i=0;i<n;i++){ if (localHour(t(i)) === 12 && Number.isFinite(D.pres[i]))
     g.push(`<text x="${X(i).toFixed(1)}" y="${yC0-2}" fill="#7d8792" font-size="9" text-anchor="middle">${Math.round(D.pres[i]/100)} hPa</text>`); }
