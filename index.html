@@ -153,7 +153,6 @@ const store = {
 const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ł/g,"l").replace(/Ł/g,"L").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const hhmm = d => d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
 const bust = u => u + (u.includes("?")?"&":"?") + "t=" + Date.now();
-const canNativeHls = document.createElement("video").canPlayType("application/vnd.apple.mpegurl") !== "";
 
 CAMS.forEach((c,i)=>c.i=i);
 let current = "wszystkie";
@@ -180,7 +179,6 @@ function renderTabs(){
 
 /* ---------- video helpers ---------- */
 function attachHls(video, src){
-  if (canNativeHls){ video.src = src; return null; }
   if (window.Hls && Hls.isSupported()){
     const h = new Hls({lowLatencyMode:false, maxBufferLength:10, capLevelToPlayerSize:true});
     h.loadSource(src); h.attachMedia(video);
@@ -232,8 +230,7 @@ function grabThumb(t){
   v.onerror = () => finish(false);
   v.addEventListener("hlsfatal", () => finish(false), {once:true});
   t.timer = setTimeout(() => finish(v.readyState >= 2), 15000);
-  if (canNativeHls){ v.src = t.c.s; }
-  else if (window.Hls && Hls.isSupported()){
+  if (window.Hls && Hls.isSupported()){
     const h = new Hls({maxBufferLength:2, maxMaxBufferLength:4, capLevelToPlayerSize:true, startLevel:0});
     h.on(Hls.Events.ERROR, (e,d)=>{ if(d.fatal) v.dispatchEvent(new Event("hlsfatal")); });
     h.loadSource(t.c.s); h.attachMedia(v);
