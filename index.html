@@ -113,14 +113,18 @@
          hls   – strumień wideo .m3u8
          embed – oficjalny odtwarzacz dostawcy (iframe)
 */
+// TOPR: aktualne zdjęcia są tylko na kamery.topr.pl (http), więc pobieramy je przez
+// pośrednika images.weserv.nl (https). s2 = zapas z pogoda.topr.pl (bywa nieaktualny).
+const TOPR = path => "https://images.weserv.nl/?url=kamery.topr.pl/" + path;
+
 const CAMS = [
   // --- Tatry (TOPR) ---
-  {r:"Tatry", n:"Morskie Oko – widok na Mnicha", t:"img", s:"https://pogoda.topr.pl/download/current/momn.jpeg", p:"https://pogoda.topr.pl/"},
-  {r:"Tatry", n:"Hala Gąsienicowa – widok na Granaty", t:"img", s:"https://pogoda.topr.pl/download/current/hala.jpeg", p:"https://pogoda.topr.pl/"},
-  {r:"Tatry", n:"Hala Gąsienicowa – widok na Kasprowy Wierch", t:"img", s:"https://pogoda.topr.pl/download/current/hgkw.jpeg", p:"https://pogoda.topr.pl/"},
-  {r:"Tatry", n:"Kasprowy Wierch – widok na Świnicę", t:"img", s:"https://pogoda.topr.pl/download/current/kwgs.jpeg", p:"https://pogoda.topr.pl/"},
-  {r:"Tatry", n:"Kasprowy Wierch – Dolina Goryczkowa / Czerwone Wierchy", t:"img", s:"https://pogoda.topr.pl/download/current/kwgr.jpeg", p:"https://pogoda.topr.pl/"},
-  {r:"Tatry", n:"Kościelisko – widok na Czerwone Wierchy", t:"img", s:"https://pogoda.topr.pl/download/current/kscw.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Morskie Oko – widok na Mnicha", t:"img", s:TOPR("moko_TPN/moko_02.jpg"), s2:"https://pogoda.topr.pl/download/current/momn.jpeg", p:"http://kamery.topr.pl/"},
+  {r:"Tatry", n:"Hala Gąsienicowa – widok na Granaty", t:"img", s:TOPR("hala/hala.jpg"), s2:"https://pogoda.topr.pl/download/current/hala.jpeg", p:"http://kamery.topr.pl/"},
+  {r:"Tatry", n:"Hala Gąsienicowa – widok na Kasprowy Wierch", t:"img", s:TOPR("hala2/hala2.jpg"), s2:"https://pogoda.topr.pl/download/current/hgkw.jpeg", p:"http://kamery.topr.pl/"},
+  {r:"Tatry", n:"Kasprowy Wierch – widok na Świnicę", t:"img", s:TOPR("gasienicowa/gasie.jpg"), s2:"https://pogoda.topr.pl/download/current/kwgs.jpeg", p:"http://kamery.topr.pl/"},
+  {r:"Tatry", n:"Kasprowy Wierch – Dolina Goryczkowa / Czerwone Wierchy", t:"img", s:TOPR("goryczkowa/gorycz.jpg"), s2:"https://pogoda.topr.pl/download/current/kwgr.jpeg", p:"http://kamery.topr.pl/"},
+  {r:"Tatry", n:"Kościelisko – widok na Czerwone Wierchy (kamera nie działa od 29.09)", t:"img", s:TOPR("czwierchy/czwierchy.jpg"), s2:"https://pogoda.topr.pl/download/current/kscw.jpeg", p:"http://kamery.topr.pl/"},
 
   // --- Beskid Żywiecki ---
   {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Tatr", t:"hls", s:"https://stream.arkomnet.eu/rysianka1/index.m3u8", p:"https://rysianka.pl/"},
@@ -262,8 +266,11 @@ function tile(c){
     img.loading = "lazy"; img.alt = c.n; img.referrerPolicy = "no-referrer";
     img.title = "Godzina wykonania zdjęcia jest w jego rogu";
     img.onload = () => { info.textContent = "sprawdzono " + hhmm(new Date()); info.classList.remove("err"); };
-    img.onerror = () => { info.textContent = "brak obrazu"; info.classList.add("err"); };
-    img.dataset.src = c.s;
+    img.onerror = () => {
+      if (c.s2 && img.dataset.src !== c.s2){ img.dataset.src = c.s2; img.src = bust(c.s2); info.textContent = "zapasowe źródło"; return; }
+      info.textContent = "brak obrazu"; info.classList.add("err");
+    };
+    img.dataset.src = c.s; img.dataset.primary = c.s;
     img.src = bust(c.s);
     frame.prepend(img);
   } else if (c.t === "hls" && autoplay){
@@ -318,7 +325,7 @@ function render(){
 }
 
 function refreshImages(){
-  document.querySelectorAll("img[data-src]").forEach(img=>{ img.src = bust(img.dataset.src); });
+  document.querySelectorAll("img[data-src]").forEach(img=>{ if (img.dataset.primary) img.dataset.src = img.dataset.primary; img.src = bust(img.dataset.src); });
   const mimg = document.querySelector("#mbody img[data-src]");
   if (mimg) mimg.src = bust(mimg.dataset.src);
 }
@@ -346,6 +353,7 @@ function openModal(i){
   if (c.t==="img"){
     m = document.createElement("img"); m.referrerPolicy="no-referrer"; m.alt=c.n;
     m.dataset.src = c.s; m.src = bust(c.s);
+    m.onerror = () => { if (c.s2 && m.dataset.src !== c.s2){ m.dataset.src = c.s2; m.src = bust(c.s2); } };
   } else if (c.t==="hls"){
     m = document.createElement("video");
     m.controls = true; m.autoplay = true; m.muted = true; m.playsInline = true; m.setAttribute("playsinline","");
