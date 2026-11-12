@@ -54,7 +54,7 @@ Szybki podgląd wybranych publicznych kamer górskich z różnych portali, w jed
 | Trzy Korony | Pieniny | 49.4147, 20.4122 |
 
 - **yr.no:** gotowy meteogram SVG na 48 h: `https://www.yr.no/en/content/<lat>,<lon>/meteogram.svg`.
-- **ICM (meteo.pl), model UM 4 km, 5 dni:** stare obrazki `mgram_pict.php` zwracają już tylko reklamę nowej aplikacji, więc meteorogram jest rysowany na stronie (SVG) z danych API aplikacji Meteo ICM: `GET https://devmgramapi.meteo.pl/meteorograms/available` oraz `POST …/meteorograms/um4_120` z `{point:{lat,lon}, date:<przebieg>}`. Działa z ememu81.github.io (CORS), ale to **nieoficjalne API aplikacji**, które może się zmienić. Pod wykresem jest wymagany przez ICM podpis źródła; strona nie może mieć reklam.
+- **ICM (meteo.pl), model UM 4 km, 60 h (`um4_60`, najnowszy przebieg, jak domyślnie w aplikacji):** stare obrazki `mgram_pict.php` zwracają już tylko reklamę nowej aplikacji, więc meteogram jest rysowany na stronie (SVG) w układzie aplikacji Meteo ICM (https://app.meteo.pl/meteogram/<lat>,<lon>). Ma 8 paneli: temperatura (powietrze, odczuwalna, punkt rosy, rozrzut), opad według rodzaju z wilgotnością, szansa opadu, ciśnienie, wiatr z porywami, kierunek wiatru, podstawy i wierzchołki chmur z widzialnością, zachmurzenie w oktantach z mgłą. Dane pochodzą z API aplikacji: `GET https://devmgramapi.meteo.pl/meteorograms/available` oraz `POST …/meteorograms/um4_60` (albo `um4_120` dla 5 dni) z `{point:{lat,lon}, date:<przebieg>}`. Działa z ememu81.github.io (CORS), ale to **nieoficjalne API aplikacji**, które może się zmienić. Pod wykresem jest wymagany przez ICM podpis źródła; strona nie może mieć reklam.
 
 Zdjęcia TOPR idą przez pośrednik: `https://images.weserv.nl/?url=kamery.topr.pl/<ścieżka>`.
 
