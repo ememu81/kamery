@@ -595,7 +595,9 @@ function weatherBox(region, defaultOpen){
 }
 
 const MAP_LAYERS = [["radar","Radar opadów"],["satellite","Satelita"],["clouds","Chmury (prognoza)"]];
-const windyUrl = ov => `https://embed.windy.com/embed2.html?lat=49.40&lon=19.70&detailLat=49.40&detailLon=19.70&zoom=7&level=surface&overlay=${ov}&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+// zoom 9 na komputerze (cały pas Ochodzita–Trzy Korony w kadrze), 8 na telefonie
+const windyZoom = () => (innerWidth < 640 ? 8 : 9);
+const windyUrl = ov => `https://embed.windy.com/embed2.html?lat=49.42&lon=19.68&detailLat=49.42&detailLon=19.68&zoom=${windyZoom()}&level=surface&overlay=${ov}&product=ecmwf&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
 function weatherMap(main){
   let layer = store.get("wxMap", "radar");
   if (!MAP_LAYERS.some(([k])=>k===layer)) layer = "radar";
@@ -607,7 +609,7 @@ function weatherMap(main){
   const body = document.createElement("div"); body.className = "wx-body";
   const f = document.createElement("iframe"); f.loading = "lazy"; f.title = "Mapa Windy"; f.allow = "fullscreen";
   const note = document.createElement("div"); note.className = "wx-src";
-  note.innerHTML = `Mapa: <a href="https://www.windy.com/?49.40,19.70,7" target="_blank" rel="noopener">Windy.com</a>. Radar i satelita – dane bieżące (przycisk ▶ odtwarza ostatnie godziny; w nocy chmury z satelity widać w kanale INF), chmury – prognoza modelu z suwakiem czasu.`;
+  note.innerHTML = `Mapa: <a href="https://www.windy.com/?49.42,19.68,9" target="_blank" rel="noopener">Windy.com</a>. Radar i satelita – dane bieżące (przycisk ▶ odtwarza ostatnie godziny; w nocy chmury z satelity widać w kanale INF), chmury – prognoza modelu z suwakiem czasu.`;
   body.append(f, note);
   box.append(head, body);
   function draw(){
