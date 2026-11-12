@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0f1216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kamery">
+<title>Kamery górskie</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#171b21; --panel2:#1f242c; --line:#2a3039;
+    --text:#e8eaed; --muted:#9aa3ad; --accent:#7cc4ff; --ok:#7bd88f; --warn:#ffb86b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:rgba(15,18,22,.94);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + 10px) 14px 0}
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px;flex:1}
+  .btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer}
+  .btn:hover{border-color:#3a424d}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+  .toggle input{accent-color:var(--accent)}
+  nav{display:flex;gap:4px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;
+    padding:8px 12px;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+  nav button.on{color:var(--text);border-bottom-color:var(--accent)}
+  nav .n{opacity:.6;font-size:12px;margin-left:4px}
+  main{padding:14px;padding-bottom:calc(env(safe-area-inset-bottom) + 20px)}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
+    margin:18px 2px 8px;font-weight:600}
+  h2:first-child{margin-top:2px}
+  .grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  @media (max-width:520px){.grid{grid-template-columns:1fr} main{padding:10px}}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    cursor:pointer;display:flex;flex-direction:column}
+  .tile:hover{border-color:#3a424d}
+  .frame{position:relative;aspect-ratio:16/9;background:#0a0c0f;overflow:hidden}
+  .frame img,.frame video,.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;display:block}
+  .frame iframe{pointer-events:none}
+  .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;color:var(--muted);font-size:13px;text-align:center;padding:10px;
+    background:radial-gradient(ellipse at center,#1a2029 0%,#0a0c0f 75%)}
+  .play{width:46px;height:46px;border-radius:50%;background:rgba(124,196,255,.15);
+    border:1px solid rgba(124,196,255,.5);display:flex;align-items:center;justify-content:center}
+  .play:after{content:"";border-left:14px solid var(--accent);border-top:9px solid transparent;
+    border-bottom:9px solid transparent;margin-left:4px}
+  .badge{position:absolute;top:8px;left:8px;font-size:11px;padding:2px 7px;border-radius:20px;
+    background:rgba(0,0,0,.6);color:#fff;letter-spacing:.3px}
+  .badge.live{background:rgba(220,40,40,.85)}
+  .meta{display:flex;align-items:baseline;gap:8px;padding:8px 10px}
+  .meta .name{flex:1;font-weight:550;font-size:14px}
+  .meta .info{font-size:12px;color:var(--muted);white-space:nowrap}
+  .err{color:var(--warn)}
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:20;background:#000;display:none;flex-direction:column}
+  .modal.open{display:flex}
+  .mbar{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;
+    background:#0f1216;border-bottom:1px solid var(--line)}
+  .mbar .t{flex:1;font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mbar a{color:var(--accent);font-size:13px;text-decoration:none;white-space:nowrap}
+  .mbody{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+  .mbody img,.mbody video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#000}
+  .mbody iframe{width:100%;height:100%;border:0;background:#000}
+  .nav-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:rgba(0,0,0,.45);
+    color:#fff;border:0;width:44px;height:64px;font-size:26px;cursor:pointer;border-radius:8px}
+  .nav-arrow.l{left:6px}.nav-arrow.r{right:6px}
+  footer{color:var(--muted);font-size:12px;padding:6px 16px 24px;text-align:center}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Kamery górskie</h1>
+    <label class="toggle" title="Odtwarza strumienie wideo bezpośrednio w kafelkach (zużywa dużo danych)">
+      <input type="checkbox" id="autoplay"> wideo w kafelkach
+    </label>
+    <button class="btn" id="refresh" title="Pobierz najnowsze zdjęcia">↻ Odśwież</button>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+<main id="main"></main>
+<footer>Zdjęcia odświeżają się co 5 min. Obraz należy do właścicieli kamer – kliknij „źródło”, aby przejść na ich stronę.</footer>
+
+<div class="modal" id="modal">
+  <div class="mbar">
+    <button class="btn" id="mclose" aria-label="Zamknij">✕</button>
+    <div class="t" id="mtitle"></div>
+    <a id="msrc" href="#" target="_blank" rel="noopener noreferrer">źródło ↗</a>
+  </div>
+  <div class="mbody" id="mbody">
+    <button class="nav-arrow l" id="mprev" aria-label="Poprzednia">‹</button>
+    <button class="nav-arrow r" id="mnext" aria-label="Następna">›</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
+<script>
+/* ======= LISTA KAMER =======
+   type: img   – zdjęcie odświeżane okresowo
+         hls   – strumień wideo .m3u8
+         embed – oficjalny odtwarzacz dostawcy (iframe)
+*/
+const CAMS = [
+  // --- Tatry (TOPR) ---
+  {r:"Tatry", n:"Morskie Oko – widok na Mnicha", t:"img", s:"https://pogoda.topr.pl/download/current/momn.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Hala Gąsienicowa – widok na Granaty", t:"img", s:"https://pogoda.topr.pl/download/current/hala.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Hala Gąsienicowa – widok na Kasprowy Wierch", t:"img", s:"https://pogoda.topr.pl/download/current/hgkw.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Kasprowy Wierch – widok na Świnicę", t:"img", s:"https://pogoda.topr.pl/download/current/kwgs.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Kasprowy Wierch – Dolina Goryczkowa / Czerwone Wierchy", t:"img", s:"https://pogoda.topr.pl/download/current/kwgr.jpeg", p:"https://pogoda.topr.pl/"},
+  {r:"Tatry", n:"Kościelisko – widok na Czerwone Wierchy", t:"img", s:"https://pogoda.topr.pl/download/current/kscw.jpeg", p:"https://pogoda.topr.pl/"},
+
+  // --- Beskid Żywiecki ---
+  {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Tatr", t:"hls", s:"https://stream.arkomnet.eu/rysianka1/index.m3u8", p:"https://rysianka.pl/"},
+  {r:"Beskid Żywiecki", n:"Rysianka – w kierunku Hali Stopkowej", t:"hls", s:"https://stream.arkomnet.eu/rysianka2/index.m3u8", p:"https://rysianka.pl/"},
+  {r:"Beskid Żywiecki", n:"Widok na Gminę Węgierska Górka", t:"hls", s:"https://stream.arkomnet.eu/wgwidok/index.m3u8", p:"https://www.wgmedia.eu/kamery/widok-na-gmine-wegierska-gorka-z-baraniej"},
+  {r:"Beskid Żywiecki", n:"Cisiec – Wyciąg Za Groniem", t:"hls", s:"https://stream.arkomnet.eu/xxx_wyciag_III/index.m3u8", p:"https://www.wgmedia.eu/kamery/cisiec-wyciag-za-groniem"},
+  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 1", t:"embed", s:"https://stream360.pl/v/Zywiec1/index1.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 2", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_f0027b", p:"https://zywiec.pl/kamery"},
+  {r:"Beskid Żywiecki", n:"Żywiec – Rynek, kamera 3", t:"embed", s:"https://stream360.pl/v/Zywiec1/index3.php", p:"https://zywiec.pl/kamery"},
+  {r:"Beskid Żywiecki", n:"Żywiec – widok ze Średniego Grojca", t:"embed", s:"https://player.webcamera.pl/zywiec_cam_1ce519", p:"https://zywiec.pl/kamery"},
+
+  // --- Gorce (Ochotnica Dolna) ---
+  {r:"Gorce", n:"Suchy Groń", t:"hls", s:"https://ochotnica.epicserv.pl/streams/cam5/playlist.m3u8", p:"https://www.ochotnica.pl/wieze-widokowe-kamery-online/"},
+  {r:"Gorce", n:"Magurki", t:"hls", s:"https://ochotnica.epicserv.pl/streams/cam1/playlist.m3u8", p:"https://www.ochotnica.pl/wieze-widokowe-kamery-online/"},
+  {r:"Gorce", n:"Lubań", t:"hls", s:"https://ochotnica.epicserv.pl/streams/cam3/playlist.m3u8", p:"https://www.ochotnica.pl/wieze-widokowe-kamery-online/"},
+  {r:"Gorce", n:"Gorc", t:"hls", s:"https://ochotnica.epicserv.pl/streams/cam4/playlist.m3u8", p:"https://www.ochotnica.pl/wieze-widokowe-kamery-online/"},
+
+  // --- Pieniny (Schronisko Trzy Korony) ---
+  {r:"Pieniny", n:"Schronisko Trzy Korony – widok na Trzy Korony", t:"embed", s:"https://static.webcamera.pl/player/schroniskapieninskie_cam_fb73aa-webcamera.html", p:"https://www.trzykorony.pl/schronisko/kamery"},
+  {r:"Pieniny", n:"Jezioro Czorsztyńskie i zamek w Czorsztynie", t:"embed", s:"https://static.webcamera.pl/player/niedzica_cam_a6aff0-webcamera.html", p:"https://www.trzykorony.pl/schronisko/kamery"},
+  {r:"Pieniny", n:"Stara Lubowla", t:"embed", s:"https://webcams.windy.com/webcams/public/embed/player?webcamId=1621786379&playerType=day&autoPlay=1&interactive=1", p:"https://www.trzykorony.pl/schronisko/kamery"},
+];
+
+const REGIONS = ["Tatry","Beskid Żywiecki","Gorce","Pieniny"];
+const REFRESH_MS = 5*60*1000;
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ł/g,"l").replace(/Ł/g,"L").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const hhmm = d => d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
+const bust = u => u + (u.includes("?")?"&":"?") + "t=" + Date.now();
+const canNativeHls = document.createElement("video").canPlayType("application/vnd.apple.mpegurl") !== "";
+
+CAMS.forEach((c,i)=>c.i=i);
+let current = "wszystkie";
+let autoplay = store.get("autoplay", false);
+const players = new Map(); // tile video -> hls instance
+
+/* ---------- tabs ---------- */
+function renderTabs(){
+  const tabs = [{k:"wszystkie",label:"Wszystkie",n:CAMS.length}]
+    .concat(REGIONS.map(r=>({k:slug(r),label:r,n:CAMS.filter(c=>c.r===r).length})));
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  tabs.forEach(t=>{
+    const b = document.createElement("button");
+    b.innerHTML = `${t.label}<span class="n">${t.n}</span>`;
+    b.className = t.k===current ? "on" : "";
+    b.onclick = () => { location.hash = t.k; };
+    nav.appendChild(b);
+  });
+}
+
+/* ---------- video helpers ---------- */
+function attachHls(video, src){
+  if (canNativeHls){ video.src = src; return null; }
+  if (window.Hls && Hls.isSupported()){
+    const h = new Hls({lowLatencyMode:false, maxBufferLength:10, capLevelToPlayerSize:true});
+    h.loadSource(src); h.attachMedia(video);
+    h.on(Hls.Events.ERROR, (e,d)=>{ if(d.fatal){ video.dispatchEvent(new Event("hlsfatal")); } });
+    return h;
+  }
+  video.src = src; return null;
+}
+function destroyTilePlayers(){
+  players.forEach((h,v)=>{ try{h&&h.destroy()}catch(e){} v.removeAttribute("src"); v.load(); });
+  players.clear();
+}
+
+function showBlocked(container, c){
+  if (container.querySelector(".blocked")) return;
+  const d = document.createElement("div");
+  d.className = "ph blocked";
+  d.style.zIndex = 1;
+  d.innerHTML = `<div>Nie udało się odtworzyć tego strumienia.<br>Dostawca może blokować odtwarzanie poza swoją stroną.</div>`;
+  const a = document.createElement("a");
+  a.href = c.p; a.target = "_blank"; a.rel = "noopener noreferrer";
+  a.textContent = "Otwórz na stronie źródłowej ↗";
+  a.style.color = "var(--accent)";
+  a.onclick = e => e.stopPropagation();
+  d.appendChild(a);
+  container.appendChild(d);
+}
+
+/* ---------- tiles ---------- */
+function tile(c){
+  const el = document.createElement("div");
+  el.className = "tile";
+  const frame = document.createElement("div");
+  frame.className = "frame";
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.innerHTML = `<span class="name"></span><span class="info"></span>`;
+  meta.querySelector(".name").textContent = c.n;
+  const info = meta.querySelector(".info");
+
+  if (c.t === "img"){
+    frame.innerHTML = `<span class="badge">zdjęcie</span>`;
+    const img = document.createElement("img");
+    img.loading = "lazy"; img.alt = c.n; img.referrerPolicy = "no-referrer";
+    img.onload = () => { info.textContent = "pobrano " + hhmm(new Date()); info.classList.remove("err"); };
+    img.onerror = () => { info.textContent = "brak obrazu"; info.classList.add("err"); };
+    img.dataset.src = c.s;
+    img.src = bust(c.s);
+    frame.prepend(img);
+  } else if (c.t === "hls" && autoplay){
+    const v = document.createElement("video");
+    v.muted = true; v.autoplay = true; v.playsInline = true; v.setAttribute("playsinline","");
+    frame.appendChild(v);
+    frame.insertAdjacentHTML("beforeend", `<span class="badge live">● na żywo</span>`);
+    players.set(v, attachHls(v, c.s));
+    const fail = ()=>{ info.textContent="brak sygnału"; info.classList.add("err"); showBlocked(frame, c); };
+    v.addEventListener("hlsfatal", fail);
+    v.addEventListener("error", fail);
+    info.textContent = "wideo";
+  } else if (c.t === "embed" && autoplay){
+    const f = document.createElement("iframe");
+    f.src = c.s; f.loading = "lazy"; f.allow = "autoplay; fullscreen"; f.referrerPolicy = "no-referrer";
+    frame.appendChild(f);
+    info.textContent = "odtwarzacz";
+  } else {
+    frame.innerHTML = `<div class="ph"><div class="play"></div><div>${c.t==="hls" ? "wideo na żywo" : "odtwarzacz dostawcy"} – stuknij</div></div>`;
+    info.textContent = c.t==="hls" ? "wideo" : "odtwarzacz";
+  }
+  el.append(frame, meta);
+  el.onclick = () => openModal(c.i);
+  return el;
+}
+
+function render(){
+  destroyTilePlayers();
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  const regions = current==="wszystkie" ? REGIONS : REGIONS.filter(r=>slug(r)===current);
+  regions.forEach(r=>{
+    const cams = CAMS.filter(c=>c.r===r);
+    if (!cams.length) return;
+    if (current==="wszystkie"){ const h=document.createElement("h2"); h.textContent=r; main.appendChild(h); }
+    const g = document.createElement("div"); g.className="grid";
+    cams.forEach(c=>g.appendChild(tile(c)));
+    main.appendChild(g);
+  });
+  renderTabs();
+}
+
+function refreshImages(){
+  document.querySelectorAll("img[data-src]").forEach(img=>{ img.src = bust(img.dataset.src); });
+  const mimg = document.querySelector("#mbody img[data-src]");
+  if (mimg) mimg.src = bust(mimg.dataset.src);
+}
+
+/* ---------- modal ---------- */
+let modalIdx = -1, modalHls = null;
+function visibleList(){
+  return current==="wszystkie" ? CAMS : CAMS.filter(c=>slug(c.r)===current);
+}
+function clearModalMedia(){
+  if (modalHls){ try{modalHls.destroy()}catch(e){} modalHls=null; }
+  document.querySelectorAll("#mbody > :not(.nav-arrow)").forEach(n=>{
+    if (n.tagName==="VIDEO"){ n.pause(); n.removeAttribute("src"); n.load(); }
+    n.remove();
+  });
+}
+function openModal(i){
+  modalIdx = i;
+  const c = CAMS[i];
+  clearModalMedia();
+  document.getElementById("mtitle").textContent = c.n;
+  document.getElementById("msrc").href = c.p;
+  const body = document.getElementById("mbody");
+  let m;
+  if (c.t==="img"){
+    m = document.createElement("img"); m.referrerPolicy="no-referrer"; m.alt=c.n;
+    m.dataset.src = c.s; m.src = bust(c.s);
+  } else if (c.t==="hls"){
+    m = document.createElement("video");
+    m.controls = true; m.autoplay = true; m.muted = true; m.playsInline = true; m.setAttribute("playsinline","");
+    modalHls = attachHls(m, c.s);
+    const fail = ()=>showBlocked(body, c);
+    m.addEventListener("hlsfatal", fail);
+    m.addEventListener("error", fail);
+  } else {
+    m = document.createElement("iframe");
+    m.src = c.s; m.allow = "autoplay; fullscreen"; m.allowFullscreen = true; m.referrerPolicy="no-referrer";
+  }
+  body.prepend(m);
+  document.getElementById("modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){
+  clearModalMedia();
+  document.getElementById("modal").classList.remove("open");
+  document.body.style.overflow = "";
+  modalIdx = -1;
+}
+function step(d){
+  const list = visibleList();
+  let pos = list.findIndex(c=>c.i===modalIdx);
+  if (pos<0) pos=0;
+  openModal(list[(pos + d + list.length) % list.length].i);
+}
+
+/* ---------- events ---------- */
+document.getElementById("mclose").onclick = closeModal;
+document.getElementById("mprev").onclick = e => { e.stopPropagation(); step(-1); };
+document.getElementById("mnext").onclick = e => { e.stopPropagation(); step(1); };
+document.addEventListener("keydown", e=>{
+  if (modalIdx<0) return;
+  if (e.key==="Escape") closeModal();
+  if (e.key==="ArrowLeft") step(-1);
+  if (e.key==="ArrowRight") step(1);
+});
+let tx=null;
+document.getElementById("mbody").addEventListener("touchstart",e=>{tx=e.touches[0].clientX},{passive:true});
+document.getElementById("mbody").addEventListener("touchend",e=>{
+  if(tx===null) return; const dx=e.changedTouches[0].clientX-tx; tx=null;
+  if (Math.abs(dx)>60 && CAMS[modalIdx] && CAMS[modalIdx].t==="img") step(dx<0?1:-1);
+},{passive:true});
+
+const ap = document.getElementById("autoplay");
+ap.checked = autoplay;
+ap.onchange = () => { autoplay = ap.checked; store.set("autoplay", autoplay); render(); };
+document.getElementById("refresh").onclick = refreshImages;
+
+function fromHash(){
+  const h = location.hash.slice(1);
+  const valid = ["wszystkie"].concat(REGIONS.map(slug));
+  current = valid.includes(h) ? h : store.get("tab","wszystkie");
+  if (!valid.includes(current)) current = "wszystkie";
+  store.set("tab", current);
+  render();
+}
+window.addEventListener("hashchange", fromHash);
+
+// odświeżanie zdjęć + oszczędzanie danych, gdy karta jest ukryta
+setInterval(()=>{ if (!document.hidden) refreshImages(); }, REFRESH_MS);
+document.addEventListener("visibilitychange", ()=>{
+  if (document.hidden){ players.forEach((h,v)=>v.pause()); }
+  else { refreshImages(); players.forEach((h,v)=>{ v.play().catch(()=>{}); }); }
+});
+
+fromHash();
+</script>
+</body>
+</html>
